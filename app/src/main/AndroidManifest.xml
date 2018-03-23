@@ -10,7 +10,7 @@
             android:supportsRtl="true"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"
             >
-        <activity android:name=".MainActivity">
+        <activity android:name=".miniEditor">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -18,11 +18,11 @@
             </intent-filter>
         </activity>
         <activity android:name=".DisplayMessageActivity"
-                  android:parentActivityName=".MainActivity" >
+                  android:parentActivityName=".miniEditor" >
             <!-- The meta-data tag is required if you support API level 15 and lower -->
             <meta-data
                     android:name="android.support.PARENT_ACTIVITY"
-                    android:value=".MainActivity" />
+                    android:value=".miniEditor" />
         </activity>
     </application>
 
