@@ -8,6 +8,7 @@ import java.io.RandomAccessFile;
 import java.lang.String;
 import android.content.Intent;
 import android.os.Environment;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -19,13 +20,32 @@ import android.widget.EditText;
 import android.widget.Toast;
 import android.widget.Button;
 import android.util.Log;
+import android.support.v4.app.ActivityCompat;
+import android.content.pm.PackageManager;
 
 public class miniEditor extends AppCompatActivity {
     public static final String EXTRA_MESSAGE = "jingruichen.mini_editor.Message";
-    String filePath = Environment.getExternalStorageDirectory()+"/save";
-    String fileName = "save.txt";
     private Button button;
     private EditText editText;
+    private static final int REQUEST_EXTERNAL_STORAGE = 1;
+    private static String[] PERMISSIONS_STORAGE = {
+            "android.permission.READ_EXTERNAL_STORAGE",
+            "android.permission.WRITE_EXTERNAL_STORAGE" };
+
+    //需要为SD卡的写入申请动态权限
+    public static void verifyStoragePermissions(AppCompatActivity activity) {
+        try {
+            //检测是否有写的权限
+            int permission = ActivityCompat.checkSelfPermission(activity,
+                    "android.permission.WRITE_EXTERNAL_STORAGE");
+            if (permission != PackageManager.PERMISSION_GRANTED) {
+                // 没有写的权限，去申请写的权限，会弹出对话框
+                ActivityCompat.requestPermissions(activity, PERMISSIONS_STORAGE,REQUEST_EXTERNAL_STORAGE);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,10 +57,7 @@ public class miniEditor extends AppCompatActivity {
         myToolbar.setLogo(R.drawable.myico);
 
 
-        //Intent intent = new Intent(this, DisplayMessageActivity.class);
-        //String message = editText.getText().toString();
-        //intent.putExtra(EXTRA_MESSAGE, message);
-
+        verifyStoragePermissions(this);
         initView();
 
     }
@@ -51,61 +68,36 @@ public class miniEditor extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                writeTxtToFile(editText.getText().toString().trim(),filePath,fileName);
+                writeTxtToFile(editText.getText().toString().trim());
+                Toast.makeText(miniEditor.this,"file saved",Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     /** Called when the user taps the save button */
-    public void writeTxtToFile(String strcontent,String filePath,String fileName) {
-        makeFilePath(filePath,fileName);
-        String strFilePath = filePath + fileName;
-        // 每次写入时，都换行写
-        String strContent = strcontent + "\r\n";
+    public void writeTxtToFile(String strcontent) {
+        File path = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)+"/save/");
+
         try {
-            File file = new File(strFilePath);
-            if (!file.exists()) {
-                Log.d("TestFile", "Create the file:" + strFilePath);
-                file.getParentFile().mkdirs();
-                file.createNewFile();
+            if(!path.exists()) {
+                path.mkdirs();
+            }
+            File file = new File(path.getAbsolutePath(),"save.txt");
+            if(!file.createNewFile()) {
+                Toast.makeText(miniEditor.this,"file already exist...",Toast.LENGTH_SHORT).show();
             }
             RandomAccessFile raf = new RandomAccessFile(file, "rwd");
             raf.seek(file.length());
-            raf.write(strContent.getBytes());
+            raf.write(strcontent.getBytes());
             raf.close();
 
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    // 生成文件
-    public File makeFilePath(String filePath, String fileName) {
-        File file = null;
-        makeRootDirectory(filePath);
-        try {
-            file = new File(filePath + fileName);
-            if (!file.exists()) {
-                file.createNewFile();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return file;
-    }
 
-    // 生成文件夹
-    public static void makeRootDirectory(String filePath) {
-        File file = null;
-        try {
-            file = new File(filePath);
-            if (!file.exists()) {
-                file.mkdir();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     public boolean onOptionsItemSelected(MenuItem item){
         switch(item.getItemId()){
