@@ -5,16 +5,15 @@
     <style name="AppTheme" parent="AppTheme.Base">
 
     </style>
-    <style name="AppTheme.Base" parent="Theme.AppCompat">
+    <style name="AppTheme.Base" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="windowActionBar">false</item>
         <!--<del><item name="android:windowNoTitle">true</item></del> -->
         <item name="android:windowNoTitle">true</item>
-
         <!-- bar color -->
         <item name="colorPrimary">@color/accent_material_dark</item>
         <item name="colorPrimaryDark">@color/accent_material_light</item>
-        <item name="android:windowDrawsSystemBarBackgrounds">@color/dim_foreground_material_dark</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">@color/accent_material_light</item>
     </style>
 
 </resources>

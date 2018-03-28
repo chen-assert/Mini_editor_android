@@ -20,5 +20,13 @@
         android:id="@+id/action_discard"
         android:title="discard"
         app:showAsAction="collapseActionView"/>
+    <item
+        android:id="@+id/action_browse"
+        android:title="browse"
+        app:showAsAction="collapseActionView"/>
+    <item
+        android:id="@+id/action_search_replace"
+        android:title="search and replace"
+        app:showAsAction="collapseActionView"/>
 
 </menu>
