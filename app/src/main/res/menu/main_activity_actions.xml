@@ -9,24 +9,25 @@
             android:id="@+id/action_favorite"
             android:icon="@drawable/ic_favorite_black_48dp"
             android:title="@string/action_favorite"
-            app:showAsAction="collapseActionView"/>
+            app:showAsAction="ifRoom|withText"/>
 
 
     <!-- Settings, should always be in the overflow -->
-    <item android:id="@+id/action_settings"
-          android:title="@string/action_settings"
-          app:showAsAction="never"/>
     <item
-        android:id="@+id/action_discard"
-        android:title="discard"
-        app:showAsAction="collapseActionView"/>
+            android:id="@+id/action_settings"
+            android:title="@string/action_settings"
+            app:showAsAction="collapseActionView"/>
     <item
-        android:id="@+id/action_browse"
-        android:title="browse"
-        app:showAsAction="collapseActionView"/>
+            android:id="@+id/action_discard"
+            android:title="discard"
+            app:showAsAction="collapseActionView"/>
     <item
-        android:id="@+id/action_search_replace"
-        android:title="search and replace"
-        app:showAsAction="collapseActionView"/>
+            android:id="@+id/action_browse"
+            android:title="browse"
+            app:showAsAction="collapseActionView"/>
+    <item
+            android:id="@+id/action_search_replace"
+            android:title="search and replace"
+            app:showAsAction="collapseActionView"/>
 
 </menu>
