@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Environment;
@@ -19,7 +20,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -40,6 +44,7 @@ public class miniEditor extends AppCompatActivity {
     public static final String EXTRA_MESSAGE = "jingruichen.mini_editor.Message";
     private Button button;
     private EditText editText;
+    private File file;
     private String filename;
     private List<String> List_of_file;
     private List<String> words;
@@ -85,11 +90,14 @@ public class miniEditor extends AppCompatActivity {
         button = (Button) findViewById(R.id.save);
         button.setBackgroundColor(Color.WHITE);
         button.setTextColor(Color.BLACK);
+
+        words = new ArrayList<String>();
+
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                writeTxtToFile(editText.getText().toString());
                 showDialog();
+                writeTxtToFile(editText.getText().toString());
                 Toast.makeText(miniEditor.this, String.format("file saved in %s", path.getAbsolutePath()), Toast.LENGTH_SHORT).show();
             }
         });
@@ -100,21 +108,27 @@ public class miniEditor extends AppCompatActivity {
      */
     public void writeTxtToFile(String strcontent) {
         List_of_file = new ArrayList<String>();
-        words = new ArrayList<String>();
-        Scanner s = new Scanner(editText.getText().toString());
-        String word;
-        while (s.hasNext()) {
-            word = s.next();
-            words.add(word);
-        }
 
         try {
             if (!path.exists()) {
                 path.mkdirs();
             }
-            File file = new File(path.getAbsolutePath(), filename);
-            if (!file.createNewFile()) {
-                Toast.makeText(miniEditor.this, "file already exist...", Toast.LENGTH_SHORT).show();
+
+            Scanner s = new Scanner(editText.getText().toString().trim());
+            String word;
+
+            while(s.hasNext()){
+                word = s.next();
+                System.out.println(word);
+                words.add(word);
+            }
+
+
+
+            file = new File(path.getAbsolutePath(),filename);
+            System.out.println(path.getAbsolutePath());
+            if(!file.createNewFile()) {
+                Toast.makeText(miniEditor.this,"file already exist...",Toast.LENGTH_SHORT).show();
                 return;
             }
             List_of_file.add(filename);
@@ -134,9 +148,10 @@ public class miniEditor extends AppCompatActivity {
         builder.setIcon(R.drawable.ic_favorite_black_48dp);
         final EditText edit = new EditText(this);
         builder.setView(edit);
+        filename = edit.getText().toString().trim();
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
-                filename = edit.getText().toString().trim();
+
             }
         });
         builder.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
@@ -164,9 +179,13 @@ public class miniEditor extends AppCompatActivity {
 
             case R.id.action_discard:
                 Toast.makeText(miniEditor.this, "File deleted...", Toast.LENGTH_SHORT).show();
+                deleteFile(file);
+                Toast.makeText(miniEditor.this,"File deleted...",Toast.LENGTH_SHORT).show();
                 break;
             case R.id.action_browse:
                 //show all saved files
+                display(builder);
+
                 break;
 
             case R.id.action_search_replace:
@@ -213,19 +232,22 @@ public class miniEditor extends AppCompatActivity {
         builder.setTitle("Search and Replace");
         builder.setIcon(R.drawable.options);
 
-        ConstraintLayout constraint = (ConstraintLayout) getLayoutInflater().inflate(R.layout.activity_main, null);
-        EditText edit1 = constraint.findViewById(R.id.old);
-        String old = edit1.getText().toString().trim();
-        EditText edit2 = constraint.findViewById(R.id.current);
-        String cur = edit2.getText().toString().trim();
-        Log.d("old&cur", String.format("%s:%s",old,cur));
-        replace(old, cur);
+        ConstraintLayout constraint = (ConstraintLayout) getLayoutInflater().inflate(R.layout.dialogs, null);
+        builder.setView(constraint);
+        final EditText edit1 = constraint.findViewById(R.id.old);
+        final EditText edit2 = constraint.findViewById(R.id.current);
+
 
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
-
+                final String old = edit1.getText().toString();
+                final String cur = edit2.getText().toString();
+                Log.d("old&cur", String.format("%s:%s",old,cur));
+                replace(old, cur);
             }
         });
+
+
         builder.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -238,20 +260,50 @@ public class miniEditor extends AppCompatActivity {
         d2.show();
     }
 
-    private void replace(String old, String cur) {
-        Iterator it = words.iterator();
-        while (it.hasNext()) {
-            String s = (String) it.next();
-            if (s.equals(old)) {
-                s = cur;
-            }
+
+    private void replace(String old,String cur){
+        if(words == null){
+            System.out.println("null");
+            return;
         }
+
+        String text = editText.getText().toString();
+        text = text.replaceAll(old,cur);
+        editText.setText(text);
     }
 
-    private void display() {
-        Iterator it = List_of_file.iterator();
-        while (it.hasNext()) {
 
+
+    private void display(AlertDialog.Builder builder){
+        builder.setTitle("All files");
+        if(List_of_file == null){
+            Toast.makeText(miniEditor.this,"No files",Toast.LENGTH_SHORT).show();
+        }
+
+        builder.setNegativeButton("cancel", null);
+
+        builder.setCancelable(true);
+        AlertDialog d2 = builder.create();
+        d2.show();
+    }
+
+    //将SD卡文件删除
+    public static void  deleteFile(File file) {
+        if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            if (file.exists()) {
+                if (file.isFile()) {
+                    file.delete();
+                }
+                // 如果它是一个目录
+                else if (file.isDirectory()) {
+                    // 声明目录下所有的文件 files[];
+                    File files[] = file.listFiles();
+                    for (int i = 0; i < files.length; i++) { // 遍历目录下所有的文件
+                        deleteFile(files[i]); // 把每个文件 用这个方法进行迭代
+                    }
+                }
+                file.delete();
+            }
         }
     }
 
