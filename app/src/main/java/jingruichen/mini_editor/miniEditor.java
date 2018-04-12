@@ -6,7 +6,8 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.RandomAccessFile;
 import java.lang.String;
-import java.util.Iterator;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -29,7 +30,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.Toast;
 import android.widget.Button;
 import android.util.Log;
@@ -46,8 +48,9 @@ public class miniEditor extends AppCompatActivity {
     private EditText editText;
     private File file;
     private String filename;
-    private List<String> List_of_file;
     private List<String> words;
+    private Map<String,String> map = new HashMap();
+    private List<Map<String,String>> MapList = new ArrayList<>();
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private static String[] PERMISSIONS_STORAGE = {
             "android.permission.READ_EXTERNAL_STORAGE",
@@ -107,7 +110,6 @@ public class miniEditor extends AppCompatActivity {
      * Called when the user taps the save button
      */
     public void writeTxtToFile(String strcontent) {
-        List_of_file = new ArrayList<String>();
 
         try {
             if (!path.exists()) {
@@ -131,7 +133,6 @@ public class miniEditor extends AppCompatActivity {
                 Toast.makeText(miniEditor.this,"file already exist...",Toast.LENGTH_SHORT).show();
                 return;
             }
-            List_of_file.add(filename);
             RandomAccessFile raf = new RandomAccessFile(file, "rwd");
             raf.seek(file.length());
             raf.write(strcontent.getBytes());
@@ -184,7 +185,7 @@ public class miniEditor extends AppCompatActivity {
                 break;
             case R.id.action_browse:
                 //show all saved files
-                display(builder);
+                display();
 
                 break;
 
@@ -274,18 +275,36 @@ public class miniEditor extends AppCompatActivity {
 
 
 
-    private void display(AlertDialog.Builder builder){
-        builder.setTitle("All files");
-        if(List_of_file == null){
-            Toast.makeText(miniEditor.this,"No files",Toast.LENGTH_SHORT).show();
+    public void display(){
+
+        ListView lv = (ListView)findViewById(R.id.lv);
+        List<String> name = new ArrayList<>();
+        if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
+            File path = Environment.getExternalStorageDirectory();
+            File[] files = path.listFiles();
+            getFileName(files,name);
         }
-
-        builder.setNegativeButton("cancel", null);
-
-        builder.setCancelable(true);
-        AlertDialog d2 = builder.create();
-        d2.show();
+        SimpleAdapter adapter = new SimpleAdapter(this,MapList,R.layout.list,new String[]{"Name"},new int[]{R.id.txt_tv});
+        lv.setAdapter(adapter);
     }
+
+    private void getFileName(File[] files,List<String> name){
+        if(files != null){
+            for(File file:files){
+                if(file.isDirectory()){
+                    getFileName(file.listFiles(),name);
+                }
+                else{
+                    String fileName = file.getName();
+                    Log.i("zeng","file name: : "+fileName);
+                    map.put("Name",fileName);
+                    MapList.add(map);
+                }
+            }
+        }
+    }
+
+
 
     //将SD卡文件删除
     public static void  deleteFile(File file) {
