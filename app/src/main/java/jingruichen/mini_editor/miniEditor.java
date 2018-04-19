@@ -1,10 +1,6 @@
 package jingruichen.mini_editor;
 
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.RandomAccessFile;
+import java.io.*;
 import java.lang.String;
 import java.util.HashMap;
 import java.util.Map;
@@ -12,6 +8,9 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import android.app.Activity;
+import android.net.Uri;
+import android.net.Uri.Builder;
 import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Canvas;
@@ -51,6 +50,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.constraint.ConstraintLayout;
 
 public class miniEditor extends AppCompatActivity {
+    private static final int REC_REQUESTCODE = 0;
     File path = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) + "/save/");
     public static final String EXTRA_MESSAGE = "jingruichen.mini_editor.Message";
     private Button button;
@@ -120,7 +120,7 @@ public class miniEditor extends AppCompatActivity {
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
 
                 //输入回车时触发事件
-                if(actionId == EditorInfo.IME_ACTION_UNSPECIFIED ){
+                if (actionId == EditorInfo.IME_ACTION_UNSPECIFIED) {
 
                     indentation(editText.getText().toString());
                 }
@@ -133,14 +133,13 @@ public class miniEditor extends AppCompatActivity {
     //auto-indentation
     public void indentation(String content) {
         SpannableString span = new SpannableString(content);
-        if(content.length() > 1 && content.charAt(content.length()-1) == '}'){
+        if (content.length() > 1 && content.charAt(content.length() - 1) == '}') {
             System.out.println("acsdfvbsdf");
-            span.setSpan(new LeadingMarginSpan.Standard(36,36),content.lastIndexOf("{"),content.indexOf("}"),Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+            span.setSpan(new LeadingMarginSpan.Standard(36, 36), content.lastIndexOf("{"), content.indexOf("}"), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
             editText.setText(span);
             editText.setSelection(content.length());
-        }
-        else if (content.length() > 1 && content.charAt(content.length() - 1) == ';') {
-            if(content.contains("{")) {
+        } else if (content.length() > 1 && content.charAt(content.length() - 1) == ';') {
+            if (content.contains("{")) {
                 span.setSpan(new LeadingMarginSpan.Standard(36, 36), content.lastIndexOf("{"), content.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
                 editText.setText(span);
                 editText.setSelection(content.length());
@@ -162,18 +161,17 @@ public class miniEditor extends AppCompatActivity {
             Scanner s = new Scanner(editText.getText().toString().trim());
             String word;
 
-            while(s.hasNext()){
+            while (s.hasNext()) {
                 word = s.nextLine();
                 System.out.println(word);
                 words.add(word);
             }
 
 
-
-            file = new File(path.getAbsolutePath(),filename);
+            file = new File(path.getAbsolutePath(), filename);
             System.out.println(path.getAbsolutePath());
-            if(!file.createNewFile()) {
-                Toast.makeText(miniEditor.this,"file already exist...",Toast.LENGTH_SHORT).show();
+            if (!file.createNewFile()) {
+                Toast.makeText(miniEditor.this, "file already exist...", Toast.LENGTH_SHORT).show();
                 return;
             }
             RandomAccessFile raf = new RandomAccessFile(file, "rwd");
@@ -224,11 +222,16 @@ public class miniEditor extends AppCompatActivity {
             case R.id.action_discard:
                 Toast.makeText(miniEditor.this, "File deleted...", Toast.LENGTH_SHORT).show();
                 deleteFile(file);
-                Toast.makeText(miniEditor.this,"File deleted...",Toast.LENGTH_SHORT).show();
+                Toast.makeText(miniEditor.this, "File deleted...", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.action_browse:
                 //show all saved files
-                display();
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("text/plain");
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                startActivityForResult(intent, REC_REQUESTCODE);
+
+                //display();
 
                 break;
 
@@ -241,7 +244,33 @@ public class miniEditor extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
 
     }
+    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+        Toast.makeText(miniEditor.this, "Starting read file", Toast.LENGTH_SHORT).show();
+        File file=new File(data.getData().getPath());
+        showInfo(file);
+    }
+    private void showInfo(File file) {
+        Toast.makeText(miniEditor.this, "!!!", Toast.LENGTH_SHORT).show();
+        String str = null;
+        try {
+            InputStream is = new FileInputStream(file);
+            InputStreamReader input = new InputStreamReader(is, "UTF-8");
+            BufferedReader reader = new BufferedReader(input);
+            editText.setText("!!!");
+            while ((str = reader.readLine()) != null) {
 
+                editText.append(str);
+                editText.append("\n");
+            }
+
+        } catch (FileNotFoundException e) {
+            // TODO Auto-generated catch block
+            Log.e("1",Log.getStackTraceString(e));
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
     private void setColors(AlertDialog.Builder builder) {
         builder.setTitle("Select text color");
         builder.setIcon(R.drawable.color);
@@ -286,7 +315,7 @@ public class miniEditor extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int which) {
                 final String old = edit1.getText().toString();
                 final String cur = edit2.getText().toString();
-                Log.d("old&cur", String.format("%s:%s",old,cur));
+                Log.d("old&cur", String.format("%s:%s", old, cur));
                 replace(old, cur);
             }
         });
@@ -305,42 +334,40 @@ public class miniEditor extends AppCompatActivity {
     }
 
 
-    private void replace(String old,String cur){
-        if(words == null){
+    private void replace(String old, String cur) {
+        if (words == null) {
             System.out.println("null");
             return;
         }
 
         String text = editText.getText().toString();
-        text = text.replaceAll(old,cur);
+        text = text.replaceAll(old, cur);
         editText.setText(text);
     }
 
 
+    public void display() {
 
-    public void display(){
-
-        ListView lv = (ListView)findViewById(R.id.lv);
+        ListView lv = (ListView) findViewById(R.id.lv);
         List<String> name = new ArrayList<>();
-        if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
+        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             File path = Environment.getExternalStorageDirectory();
             File[] files = path.listFiles();
-            getFileName(files,name);
+            getFileName(files, name);
         }
-        SimpleAdapter adapter = new SimpleAdapter(this,MapList,R.layout.list,new String[]{"Name"},new int[]{R.id.txt_tv});
+        SimpleAdapter adapter = new SimpleAdapter(this, MapList, R.layout.list, new String[]{"Name"}, new int[]{R.id.txt_tv});
         lv.setAdapter(adapter);
     }
 
-    private void getFileName(File[] files,List<String> name){
-        if(files != null){
-            for(File file:files){
-                if(file.isDirectory()){
-                    getFileName(file.listFiles(),name);
-                }
-                else{
+    private void getFileName(File[] files, List<String> name) {
+        if (files != null) {
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    getFileName(file.listFiles(), name);
+                } else {
                     String fileName = file.getName();
-                    Log.i("zeng","file name: : "+fileName);
-                    map.put("Name",fileName);
+                    Log.i("zeng", "file name: : " + fileName);
+                    map.put("Name", fileName);
                     MapList.add(map);
                 }
             }
@@ -348,10 +375,9 @@ public class miniEditor extends AppCompatActivity {
     }
 
 
-
     //将SD卡文件删除
-    public static void  deleteFile(File file) {
-        if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+    public static void deleteFile(File file) {
+        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             if (file.exists()) {
                 if (file.isFile()) {
                     file.delete();
