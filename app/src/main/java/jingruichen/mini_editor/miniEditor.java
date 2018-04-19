@@ -14,24 +14,33 @@ import java.util.Scanner;
 
 import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.Layout;
+import android.text.Selection;
+import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
+import android.text.style.LeadingMarginSpan;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.Button;
 import android.util.Log;
@@ -49,9 +58,10 @@ public class miniEditor extends AppCompatActivity {
     private File file;
     private String filename;
     private List<String> words;
-    private Map<String,String> map = new HashMap();
-    private List<Map<String,String>> MapList = new ArrayList<>();
+    private Map<String, String> map = new HashMap();
+    private List<Map<String, String>> MapList = new ArrayList<>();
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
+    public int count = 1;
     private static String[] PERMISSIONS_STORAGE = {
             "android.permission.READ_EXTERNAL_STORAGE",
             "android.permission.WRITE_EXTERNAL_STORAGE"};
@@ -94,7 +104,7 @@ public class miniEditor extends AppCompatActivity {
         button.setBackgroundColor(Color.WHITE);
         button.setTextColor(Color.BLACK);
 
-        words = new ArrayList<String>();
+        words = new ArrayList<>();
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -104,7 +114,40 @@ public class miniEditor extends AppCompatActivity {
                 Toast.makeText(miniEditor.this, String.format("file saved in %s", path.getAbsolutePath()), Toast.LENGTH_SHORT).show();
             }
         });
+
+        editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+
+                //输入回车时触发事件
+                if(actionId == EditorInfo.IME_ACTION_UNSPECIFIED ){
+
+                    indentation(editText.getText().toString());
+                }
+                return false;
+            }
+        });
+
     }
+
+    //auto-indentation
+    public void indentation(String content) {
+        SpannableString span = new SpannableString(content);
+        if(content.length() > 1 && content.charAt(content.length()-1) == '}'){
+            System.out.println("acsdfvbsdf");
+            span.setSpan(new LeadingMarginSpan.Standard(36,36),content.lastIndexOf("{"),content.indexOf("}"),Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+            editText.setText(span);
+            editText.setSelection(content.length());
+        }
+        else if (content.length() > 1 && content.charAt(content.length() - 1) == ';') {
+            if(content.contains("{")) {
+                span.setSpan(new LeadingMarginSpan.Standard(36, 36), content.lastIndexOf("{"), content.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                editText.setText(span);
+                editText.setSelection(content.length());
+            }
+        }
+    }
+
 
     /**
      * Called when the user taps the save button
@@ -120,7 +163,7 @@ public class miniEditor extends AppCompatActivity {
             String word;
 
             while(s.hasNext()){
-                word = s.next();
+                word = s.nextLine();
                 System.out.println(word);
                 words.add(word);
             }
