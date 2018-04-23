@@ -230,9 +230,7 @@ public class miniEditor extends AppCompatActivity {
                 intent.setType("text/plain");
                 intent.addCategory(Intent.CATEGORY_OPENABLE);
                 startActivityForResult(intent, REC_REQUESTCODE);
-
                 //display();
-
                 break;
 
             case R.id.action_search_replace:
