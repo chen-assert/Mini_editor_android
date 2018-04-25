@@ -2,6 +2,7 @@ package jingruichen.mini_editor;
 
 import java.io.*;
 import java.lang.String;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
@@ -16,7 +17,9 @@ import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.os.Build;
 import android.os.Environment;
+import android.os.StrictMode;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -227,10 +230,10 @@ public class miniEditor extends AppCompatActivity {
             case R.id.action_browse:
                 //show all saved files
                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                //now only can read .txt file
                 intent.setType("text/plain");
                 intent.addCategory(Intent.CATEGORY_OPENABLE);
                 startActivityForResult(intent, REC_REQUESTCODE);
-                //display();
                 break;
 
             case R.id.action_search_replace:
@@ -242,33 +245,34 @@ public class miniEditor extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
 
     }
-    protected void onActivityResult(int requestCode, int resultCode, Intent data){
-        Toast.makeText(miniEditor.this, "Starting read file", Toast.LENGTH_SHORT).show();
-        File file=new File(data.getData().getPath());
-        showInfo(file);
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Toast.makeText(this, "uri:" + data.getData().getPath(), Toast.LENGTH_SHORT).show();
+        //Toast.makeText(miniEditor.this, "Starting read file", Toast.LENGTH_SHORT).show();
+        showInfo(data);
     }
-    private void showInfo(File file) {
-        Toast.makeText(miniEditor.this, "!!!", Toast.LENGTH_SHORT).show();
+
+    private void showInfo(Intent data) {
+        //Toast.makeText(miniEditor.this, "Starting read file stage 2", Toast.LENGTH_SHORT).show();
         String str = null;
         try {
-            InputStream is = new FileInputStream(file);
+            InputStream is = getContentResolver().openInputStream(data.getData());
             InputStreamReader input = new InputStreamReader(is, "UTF-8");
             BufferedReader reader = new BufferedReader(input);
-            editText.setText("!!!");
             while ((str = reader.readLine()) != null) {
-
                 editText.append(str);
                 editText.append("\n");
             }
 
         } catch (FileNotFoundException e) {
             // TODO Auto-generated catch block
-            Log.e("1",Log.getStackTraceString(e));
+            Log.e("1", Log.getStackTraceString(e));
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
+
     private void setColors(AlertDialog.Builder builder) {
         builder.setTitle("Select text color");
         builder.setIcon(R.drawable.color);
@@ -344,19 +348,6 @@ public class miniEditor extends AppCompatActivity {
     }
 
 
-    public void display() {
-
-        ListView lv = (ListView) findViewById(R.id.lv);
-        List<String> name = new ArrayList<>();
-        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-            File path = Environment.getExternalStorageDirectory();
-            File[] files = path.listFiles();
-            getFileName(files, name);
-        }
-        SimpleAdapter adapter = new SimpleAdapter(this, MapList, R.layout.list, new String[]{"Name"}, new int[]{R.id.txt_tv});
-        lv.setAdapter(adapter);
-    }
-
     private void getFileName(File[] files, List<String> name) {
         if (files != null) {
             for (File file : files) {
@@ -400,4 +391,19 @@ public class miniEditor extends AppCompatActivity {
         inflater.inflate(R.menu.main_activity_actions, menu);
         return true;
     }
+
+    @Deprecated
+    public void display() {
+
+        ListView lv = (ListView) findViewById(R.id.lv);
+        List<String> name = new ArrayList<>();
+        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            File path = Environment.getExternalStorageDirectory();
+            File[] files = path.listFiles();
+            getFileName(files, name);
+        }
+        SimpleAdapter adapter = new SimpleAdapter(this, MapList, R.layout.list, new String[]{"Name"}, new int[]{R.id.txt_tv});
+        lv.setAdapter(adapter);
+    }
+
 }
