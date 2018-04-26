@@ -59,12 +59,8 @@ public class miniEditor extends AppCompatActivity {
     private Button button;
     private EditText editText;
     private File file;
-    private String filename;
     private List<String> words;
-    private Map<String, String> map = new HashMap();
-    private List<Map<String, String>> MapList = new ArrayList<>();
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
-    public int count = 1;
     private static String[] PERMISSIONS_STORAGE = {
             "android.permission.READ_EXTERNAL_STORAGE",
             "android.permission.WRITE_EXTERNAL_STORAGE"};
@@ -93,7 +89,6 @@ public class miniEditor extends AppCompatActivity {
         myToolbar.setTitleTextColor(Color.MAGENTA);
         myToolbar.setBackgroundColor(Color.CYAN);
         setSupportActionBar(myToolbar);
-        //myToolbar.setLogo(R.drawable.snowflake);
 
 
         verifyStoragePermissions(this);
@@ -113,8 +108,7 @@ public class miniEditor extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 showDialog();
-                writeTxtToFile(editText.getText().toString());
-                Toast.makeText(miniEditor.this, String.format("file saved in %s", path.getAbsolutePath()), Toast.LENGTH_SHORT).show();
+
             }
         });
 
@@ -152,51 +146,48 @@ public class miniEditor extends AppCompatActivity {
 
 
     /**
-     * Called when the user taps the save button
+     * Called when the user taps the OK button
      */
-    public void writeTxtToFile(String strcontent) {
+    public boolean writeTxtToFile(String strcontent,String filename) {
 
         try {
             if (!path.exists()) {
                 path.mkdirs();
             }
 
-            Scanner s = new Scanner(editText.getText().toString().trim());
-            String word;
 
-            while (s.hasNext()) {
-                word = s.nextLine();
-                System.out.println(word);
-                words.add(word);
-            }
-
-
-            file = new File(path.getAbsolutePath(), filename);
+            file = new File(path.getAbsolutePath(),filename);
             System.out.println(path.getAbsolutePath());
-            if (!file.createNewFile()) {
-                Toast.makeText(miniEditor.this, "file already exist...", Toast.LENGTH_SHORT).show();
-                return;
+            if (!file.exists()) {
+                file.createNewFile();
+                return true;
             }
-            RandomAccessFile raf = new RandomAccessFile(file, "rwd");
-            raf.seek(file.length());
-            raf.write(strcontent.getBytes());
-            raf.close();
+            else{
+                Toast.makeText(miniEditor.this, "file already exist...", Toast.LENGTH_SHORT).show();
+            }
+            FileOutputStream fos = new FileOutputStream(file, true);
+            fos.write(strcontent.getBytes());
+            fos.close();
 
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return false;
     }
 
     public void showDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Enter file name");
         builder.setIcon(R.drawable.ic_favorite_black_48dp);
-        final EditText edit = new EditText(this);
-        builder.setView(edit);
-        filename = edit.getText().toString().trim();
+        ConstraintLayout constraint = (ConstraintLayout) getLayoutInflater().inflate(R.layout.dialogs_savingfiles, null);
+        builder.setView(constraint);
+        final EditText edit = constraint.findViewById(R.id.name);
+
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
-
+                if (writeTxtToFile(editText.getText().toString(),edit.getText().toString())) {
+                    Toast.makeText(miniEditor.this, String.format("file saved in %s", path.getAbsolutePath()), Toast.LENGTH_SHORT).show();
+                }
             }
         });
         builder.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
@@ -214,9 +205,6 @@ public class miniEditor extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         switch (item.getItemId()) {
-            case R.id.action_favorite:
-                Toast.makeText(miniEditor.this, "Added to favorite", Toast.LENGTH_SHORT).show();
-                break;
 
             case R.id.action_settings:
                 setColors(builder);
@@ -348,21 +336,6 @@ public class miniEditor extends AppCompatActivity {
     }
 
 
-    private void getFileName(File[] files, List<String> name) {
-        if (files != null) {
-            for (File file : files) {
-                if (file.isDirectory()) {
-                    getFileName(file.listFiles(), name);
-                } else {
-                    String fileName = file.getName();
-                    Log.i("zeng", "file name: : " + fileName);
-                    map.put("Name", fileName);
-                    MapList.add(map);
-                }
-            }
-        }
-    }
-
 
     //将SD卡文件删除
     public static void deleteFile(File file) {
@@ -371,12 +344,11 @@ public class miniEditor extends AppCompatActivity {
                 if (file.isFile()) {
                     file.delete();
                 }
-                // 如果它是一个目录
+
                 else if (file.isDirectory()) {
-                    // 声明目录下所有的文件 files[];
                     File files[] = file.listFiles();
-                    for (int i = 0; i < files.length; i++) { // 遍历目录下所有的文件
-                        deleteFile(files[i]); // 把每个文件 用这个方法进行迭代
+                    for (int i = 0; i < files.length; i++) {
+                        deleteFile(files[i]);
                     }
                 }
                 file.delete();
@@ -392,18 +364,5 @@ public class miniEditor extends AppCompatActivity {
         return true;
     }
 
-    @Deprecated
-    public void display() {
-
-        ListView lv = (ListView) findViewById(R.id.lv);
-        List<String> name = new ArrayList<>();
-        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-            File path = Environment.getExternalStorageDirectory();
-            File[] files = path.listFiles();
-            getFileName(files, name);
-        }
-        SimpleAdapter adapter = new SimpleAdapter(this, MapList, R.layout.list, new String[]{"Name"}, new int[]{R.id.txt_tv});
-        lv.setAdapter(adapter);
-    }
 
 }

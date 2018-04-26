@@ -4,13 +4,6 @@
       xmlns:tools="http://schemas.android.com/tools"
       tools:context=".miniEditor">
 
-    <!-- "Mark Favorite", should appear as action button if possible -->
-    <item
-            android:id="@+id/action_favorite"
-            android:icon="@drawable/ic_favorite_black_48dp"
-            android:title="@string/action_favorite"
-            app:showAsAction="ifRoom|withText"/>
-
 
     <!-- Settings, should always be in the overflow -->
     <item
