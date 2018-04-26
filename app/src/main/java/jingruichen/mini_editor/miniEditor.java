@@ -24,12 +24,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.text.Layout;
-import android.text.Selection;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.SpannableStringBuilder;
-import android.text.Spanned;
+import android.text.*;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.LeadingMarginSpan;
 import android.view.KeyEvent;
@@ -53,19 +48,19 @@ import android.support.v7.app.AlertDialog;
 import android.support.constraint.ConstraintLayout;
 
 public class miniEditor extends AppCompatActivity {
-    private static final int REC_REQUESTCODE = 0;
+    protected static final int REC_REQUESTCODE = 0;
     File path = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) + "/save/");
-    public static final String EXTRA_MESSAGE = "jingruichen.mini_editor.Message";
-    private Button button;
-    private EditText editText;
-    private File file;
-    private String filename;
-    private List<String> words;
-    private Map<String, String> map = new HashMap();
-    private List<Map<String, String>> MapList = new ArrayList<>();
-    private static final int REQUEST_EXTERNAL_STORAGE = 1;
+    protected static final String EXTRA_MESSAGE = "jingruichen.mini_editor.Message";
+    protected Button button;
+    protected EditText editText;
+    protected File file;
+    protected String filename;
+    protected List<String> words;
+    protected Map<String, String> map = new HashMap();
+    protected List<Map<String, String>> MapList = new ArrayList<>();
+    protected static final int REQUEST_EXTERNAL_STORAGE = 1;
     public int count = 1;
-    private static String[] PERMISSIONS_STORAGE = {
+    protected static String[] PERMISSIONS_STORAGE = {
             "android.permission.READ_EXTERNAL_STORAGE",
             "android.permission.WRITE_EXTERNAL_STORAGE"};
 
@@ -93,15 +88,12 @@ public class miniEditor extends AppCompatActivity {
         myToolbar.setTitleTextColor(Color.MAGENTA);
         myToolbar.setBackgroundColor(Color.CYAN);
         setSupportActionBar(myToolbar);
-        //myToolbar.setLogo(R.drawable.snowflake);
-
-
         verifyStoragePermissions(this);
         initView();
 
     }
 
-    private void initView() {
+    protected void initView() {
         editText = (EditText) findViewById(R.id.editText);
         button = (Button) findViewById(R.id.save);
         button.setBackgroundColor(Color.WHITE);
@@ -119,37 +111,74 @@ public class miniEditor extends AppCompatActivity {
         });
 
         editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-
                 //输入回车时触发事件
                 if (actionId == EditorInfo.IME_ACTION_UNSPECIFIED) {
-
-                    indentation(editText.getText().toString());
+                    //indentation(editText.getText().toString());
                 }
                 return false;
             }
         });
+        editText.addTextChangedListener(new TextWatcher() {
+            int sj = 0;
 
-    }
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int before, int count) {
 
-    //auto-indentation
-    public void indentation(String content) {
-        SpannableString span = new SpannableString(content);
-        if (content.length() > 1 && content.charAt(content.length() - 1) == '}') {
-            System.out.println("acsdfvbsdf");
-            span.setSpan(new LeadingMarginSpan.Standard(36, 36), content.lastIndexOf("{"), content.indexOf("}"), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-            editText.setText(span);
-            editText.setSelection(content.length());
-        } else if (content.length() > 1 && content.charAt(content.length() - 1) == ';') {
-            if (content.contains("{")) {
-                span.setSpan(new LeadingMarginSpan.Standard(36, 36), content.lastIndexOf("{"), content.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-                editText.setText(span);
-                editText.setSelection(content.length());
             }
-        }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                //Toast.makeText(miniEditor.this, String.format("%d %d %d",start,before,count), Toast.LENGTH_SHORT).show();
+                if (count == 1) {
+                    //Toast.makeText(miniEditor.this, String.format("%c",s.charAt(start)), Toast.LENGTH_SHORT).show();
+                    char in = s.charAt(start);
+                    if (in == '{') sj++;
+                    if (in == '}') {
+                        if(sj>0) sj--;
+                    }
+                    if (in == '\n') indentation2(editText.getText().toString(),sj);
+                }
+            }
+            @Override
+            public void afterTextChanged(Editable editable) {
+            }
+        });
     }
 
+    public void indentation2(String content,int sj) {
+        String newContent=content;
+        for(int i=0;i<sj;i++){
+            newContent=newContent+'\t';
+        }
+        editText.setText(newContent);
+        editText.setSelection(newContent.length());
+    }
+
+    public void showDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Enter file name");
+        builder.setIcon(R.drawable.options);
+        final EditText edit = new EditText(this);
+        builder.setView(edit);
+        filename = edit.getText().toString().trim();
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        builder.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Toast.makeText(miniEditor.this, "you cancelled", Toast.LENGTH_SHORT).show();
+            }
+        });
+        builder.setCancelable(true);
+        AlertDialog d = builder.create();
+        d.show();
+    }
 
     /**
      * Called when the user taps the save button
@@ -187,29 +216,23 @@ public class miniEditor extends AppCompatActivity {
         }
     }
 
-    public void showDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Enter file name");
-        builder.setIcon(R.drawable.ic_favorite_black_48dp);
-        final EditText edit = new EditText(this);
-        builder.setView(edit);
-        filename = edit.getText().toString().trim();
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
 
+    //this class control about auto-indentation
+    public void indentation(String content) {
+        SpannableString span = new SpannableString(content);
+        if (content.length() > 1 && content.charAt(content.length() - 1) == '}') {
+            System.out.println("acsdfvbsdf");
+            span.setSpan(new LeadingMarginSpan.Standard(36, 36), content.lastIndexOf("{"), content.indexOf("}"), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+            editText.setText(span);
+            editText.setSelection(content.length());
+        } else if (content.length() > 1 && content.charAt(content.length() - 1) == ';') {
+            if (content.contains("{")) {
+                span.setSpan(new LeadingMarginSpan.Standard(36, 36), content.lastIndexOf("{"), content.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                editText.setText(span);
+                editText.setSelection(content.length());
             }
-        });
-        builder.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Toast.makeText(miniEditor.this, "you cancelled", Toast.LENGTH_SHORT).show();
-            }
-        });
-        builder.setCancelable(true);
-        AlertDialog d = builder.create();
-        d.show();
+        }
     }
-
 
     public boolean onOptionsItemSelected(MenuItem item) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -230,10 +253,10 @@ public class miniEditor extends AppCompatActivity {
             case R.id.action_browse:
                 //show all saved files
                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                //now only can read .txt file
+                //now only can read .txt file?
                 intent.setType("text/plain");
                 intent.addCategory(Intent.CATEGORY_OPENABLE);
-                startActivityForResult(intent, REC_REQUESTCODE);
+                this.startActivityForResult(intent, REC_REQUESTCODE);
                 break;
 
             case R.id.action_search_replace:
@@ -248,32 +271,30 @@ public class miniEditor extends AppCompatActivity {
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         Toast.makeText(this, "uri:" + data.getData().getPath(), Toast.LENGTH_SHORT).show();
-        //Toast.makeText(miniEditor.this, "Starting read file", Toast.LENGTH_SHORT).show();
         showInfo(data);
     }
 
-    private void showInfo(Intent data) {
-        //Toast.makeText(miniEditor.this, "Starting read file stage 2", Toast.LENGTH_SHORT).show();
+    protected void showInfo(Intent data) {
         String str = null;
         try {
-            InputStream is = getContentResolver().openInputStream(data.getData());
+            InputStream is = this.getContentResolver().openInputStream(data.getData());
             InputStreamReader input = new InputStreamReader(is, "UTF-8");
             BufferedReader reader = new BufferedReader(input);
+            editText.setText("");
+            int flag = 0;
             while ((str = reader.readLine()) != null) {
+                if (flag != 0) editText.append("\n");
                 editText.append(str);
-                editText.append("\n");
+                flag = 1;
             }
-
         } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
             Log.e("1", Log.getStackTraceString(e));
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            Log.e("1", Log.getStackTraceString(e));
         }
     }
 
-    private void setColors(AlertDialog.Builder builder) {
+    protected void setColors(AlertDialog.Builder builder) {
         builder.setTitle("Select text color");
         builder.setIcon(R.drawable.color);
 
@@ -303,7 +324,7 @@ public class miniEditor extends AppCompatActivity {
         d.show();
     }
 
-    private void find_and_replace(AlertDialog.Builder builder) {
+    protected void find_and_replace(AlertDialog.Builder builder) {
         builder.setTitle("Search and Replace");
         builder.setIcon(R.drawable.options);
 
@@ -336,7 +357,7 @@ public class miniEditor extends AppCompatActivity {
     }
 
 
-    private void replace(String old, String cur) {
+    protected void replace(String old, String cur) {
         if (words == null) {
             System.out.println("null");
             return;
@@ -348,7 +369,7 @@ public class miniEditor extends AppCompatActivity {
     }
 
 
-    private void getFileName(File[] files, List<String> name) {
+    protected void getFileName(File[] files, List<String> name) {
         if (files != null) {
             for (File file : files) {
                 if (file.isDirectory()) {
@@ -391,6 +412,7 @@ public class miniEditor extends AppCompatActivity {
         inflater.inflate(R.menu.main_activity_actions, menu);
         return true;
     }
+
 
     @Deprecated
     public void display() {

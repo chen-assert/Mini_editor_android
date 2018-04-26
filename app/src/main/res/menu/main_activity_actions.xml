@@ -19,7 +19,7 @@
             app:showAsAction="collapseActionView"/>
     <item
             android:id="@+id/action_discard"
-            android:title="discard"
+            android:title="discard(invalid)"
             app:showAsAction="collapseActionView"/>
     <item
             android:id="@+id/action_browse"
