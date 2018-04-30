@@ -52,30 +52,24 @@ public class miniEditor extends AppCompatActivity {
     File path = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) + "/save/");
     protected static final String EXTRA_MESSAGE = "jingruichen.mini_editor.Message";
     protected Button button;
-    protected EditText editText;
+    protected static MyEditText editText;
     protected File file;
-    protected String filename;
-    protected List<String> words;
-    protected Map<String, String> map = new HashMap();
-    protected List<Map<String, String>> MapList = new ArrayList<>();
+    protected List<String> words = new ArrayList<>();
     protected static final int REQUEST_EXTERNAL_STORAGE = 1;
-    public int count = 1;
     protected static String[] PERMISSIONS_STORAGE = {
             "android.permission.READ_EXTERNAL_STORAGE",
             "android.permission.WRITE_EXTERNAL_STORAGE"};
 
-    //需要为SD卡的写入申请动态权限
+
     public static void verifyStoragePermissions(AppCompatActivity activity) {
         try {
-            //检测是否有写的权限
             int permission = ActivityCompat.checkSelfPermission(activity,
                     "android.permission.WRITE_EXTERNAL_STORAGE");
             if (permission != PackageManager.PERMISSION_GRANTED) {
-                // 没有写的权限，去申请写的权限，会弹出对话框
                 ActivityCompat.requestPermissions(activity, PERMISSIONS_STORAGE, REQUEST_EXTERNAL_STORAGE);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception editText) {
+            editText.printStackTrace();
         }
     }
 
@@ -96,33 +90,21 @@ public class miniEditor extends AppCompatActivity {
     }
 
     protected void initView() {
-        editText = (EditText) findViewById(R.id.editText);
+        editText = findViewById(R.id.editText);
         button = (Button) findViewById(R.id.save);
         button.setBackgroundColor(Color.WHITE);
         button.setTextColor(Color.BLACK);
 
-        words = new ArrayList<>();
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 showDialog();
-                writeTxtToFile(editText.getText().toString());
-                Toast.makeText(miniEditor.this, String.format("file saved in %s", path.getAbsolutePath()), Toast.LENGTH_SHORT).show();
             }
         });
 
-        editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
 
-                //输入回车时触发事件
-                if (actionId == EditorInfo.IME_ACTION_UNSPECIFIED) {
-                    //indentation(editText.getText().toString());
-                }
-                return false;
-            }
-        });
+
         editText.addTextChangedListener(new TextWatcher() {
             int sj = 0;
 
@@ -143,6 +125,8 @@ public class miniEditor extends AppCompatActivity {
                     }
                     if (in == '\n') indentation2(editText.getText().toString(),sj);
                 }
+
+
             }
             @Override
             public void afterTextChanged(Editable editable) {
@@ -153,34 +137,13 @@ public class miniEditor extends AppCompatActivity {
     public void indentation2(String content,int sj) {
         String newContent=content;
         for(int i=0;i<sj;i++){
-            newContent=newContent+'\t';
+            newContent=newContent+'\t'+'\t';
         }
         editText.setText(newContent);
         editText.setSelection(newContent.length());
     }
 
-    public void showDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Enter file name");
-        builder.setIcon(R.drawable.options);
-        final EditText edit = new EditText(this);
-        builder.setView(edit);
-        filename = edit.getText().toString().trim();
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
 
-            }
-        });
-        builder.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Toast.makeText(miniEditor.this, "you cancelled", Toast.LENGTH_SHORT).show();
-            }
-        });
-        builder.setCancelable(true);
-        AlertDialog d = builder.create();
-        d.show();
-    }
 
     /**
      * Called when the user taps the OK button
@@ -206,8 +169,8 @@ public class miniEditor extends AppCompatActivity {
             fos.write(strcontent.getBytes());
             fos.close();
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception editText) {
+            editText.printStackTrace();
         }
         return false;
     }
@@ -222,9 +185,19 @@ public class miniEditor extends AppCompatActivity {
 
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
+                Scanner s = new Scanner(editText.getText().toString());
+                keywordHighlighting kwh = new keywordHighlighting();
+                while(s.hasNext()){
+                    String w = s.next();
+                    System.out.println("w:"+w);
+                    words.add(w);
+                }
+                if(edit.getText().toString().endsWith(".c")) kwh.Highlight(words);
                 if (writeTxtToFile(editText.getText().toString(),edit.getText().toString())) {
                     Toast.makeText(miniEditor.this, String.format("file saved in %s", path.getAbsolutePath()), Toast.LENGTH_SHORT).show();
+
                 }
+
             }
         });
         builder.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
@@ -286,14 +259,15 @@ public class miniEditor extends AppCompatActivity {
             editText.setText("");
             int flag = 0;
             while ((str = reader.readLine()) != null) {
+                System.out.println("aaaaaaaaaaaaaaaaaaaaa");
                 if (flag != 0) editText.append("\n");
                 editText.append(str);
                 flag = 1;
             }
-        } catch (FileNotFoundException e) {
-            Log.e("1", Log.getStackTraceString(e));
-        } catch (IOException e) {
-            Log.e("1", Log.getStackTraceString(e));
+        } catch (FileNotFoundException editText) {
+            Log.e("1", Log.getStackTraceString(editText));
+        } catch (IOException editText) {
+            Log.e("1", Log.getStackTraceString(editText));
         }
     }
 
@@ -324,6 +298,7 @@ public class miniEditor extends AppCompatActivity {
         });
         builder.setCancelable(true);
         AlertDialog d = builder.create();
+        editText.setSelection(editText.getText().toString().length());
         d.show();
     }
 
@@ -369,6 +344,8 @@ public class miniEditor extends AppCompatActivity {
         String text = editText.getText().toString();
         text = text.replaceAll(old, cur);
         editText.setText(text);
+        System.out.println(editText.getText().toString());
+        editText.setSelection(text.length());
     }
 
 
