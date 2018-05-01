@@ -2,50 +2,30 @@ package jingruichen.mini_editor;
 
 import java.io.*;
 import java.lang.String;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import android.app.Activity;
-import android.net.Uri;
-import android.net.Uri.Builder;
-import android.app.Dialog;
+import android.content.DialogInterface;
+import android.content.pm.PackageManager;
 import android.content.Intent;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
-import android.os.Build;
 import android.os.Environment;
-import android.os.StrictMode;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.text.*;
+import android.text.Editable;
+import android.text.SpannableString;
+import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
-import android.text.style.LeadingMarginSpan;
-import android.view.KeyEvent;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.inputmethod.EditorInfo;
-import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.SimpleAdapter;
-import android.widget.TextView;
-import android.widget.Toast;
-import android.widget.Button;
 import android.util.Log;
-import android.support.v4.app.ActivityCompat;
-import android.content.pm.PackageManager;
-import android.content.DialogInterface;
-import android.support.v7.app.AlertDialog;
-import android.support.constraint.ConstraintLayout;
+import android.view.*;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
 public class miniEditor extends AppCompatActivity {
     protected static final int REC_REQUESTCODE = 0;
@@ -104,7 +84,6 @@ public class miniEditor extends AppCompatActivity {
         });
 
 
-
         editText.addTextChangedListener(new TextWatcher() {
             int sj = 0;
 
@@ -121,34 +100,40 @@ public class miniEditor extends AppCompatActivity {
                     char in = s.charAt(start);
                     if (in == '{') sj++;
                     if (in == '}') {
-                        if(sj>0) sj--;
+                        if (sj > 0) sj--;
+                        //delete one '\t'(if possible)
+                        //editText.setText((editText.getText().subSequence(0,editText.length()-3)));
+                        if (editText.getText().subSequence(Math.max(editText.length() - 3, 0), editText.length()).toString().equals("\t\t}")) {
+                            editText.setText((editText.getText().delete(editText.length() - 3, editText.length())).append('}'));
+                            editText.setSelection(editText.length());
+                        }
                     }
-                    if (in == '\n') indentation2(editText.getText().toString(),sj);
+                    if (in == '\n') indentation(editText.getText().toString(), sj);
                 }
 
 
             }
+
             @Override
             public void afterTextChanged(Editable editable) {
             }
         });
     }
 
-    public void indentation2(String content,int sj) {
-        String newContent=content;
-        for(int i=0;i<sj;i++){
-            newContent=newContent+'\t'+'\t';
+    public void indentation(String content, int sj) {
+        String newContent = content;
+        for (int i = 0; i < sj; i++) {
+            newContent = newContent + '\t' + '\t';
         }
         editText.setText(newContent);
         editText.setSelection(newContent.length());
     }
 
 
-
     /**
      * Called when the user taps the OK button
      */
-    public boolean writeTxtToFile(String strcontent,String filename) {
+    public boolean writeTxtToFile(String strcontent, String filename) {
 
         try {
             if (!path.exists()) {
@@ -156,13 +141,12 @@ public class miniEditor extends AppCompatActivity {
             }
 
 
-            file = new File(path.getAbsolutePath(),filename);
+            file = new File(path.getAbsolutePath(), filename);
             System.out.println(path.getAbsolutePath());
             if (!file.exists()) {
                 file.createNewFile();
                 return true;
-            }
-            else{
+            } else {
                 Toast.makeText(miniEditor.this, "file already exist...", Toast.LENGTH_SHORT).show();
             }
             FileOutputStream fos = new FileOutputStream(file, true);
@@ -187,13 +171,13 @@ public class miniEditor extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int which) {
                 Scanner s = new Scanner(editText.getText().toString());
                 keywordHighlighting kwh = new keywordHighlighting();
-                while(s.hasNext()){
+                while (s.hasNext()) {
                     String w = s.next();
-                    System.out.println("w:"+w);
+                    System.out.println("w:" + w);
                     words.add(w);
                 }
-                if(edit.getText().toString().endsWith(".c")) kwh.Highlight(words);
-                if (writeTxtToFile(editText.getText().toString(),edit.getText().toString())) {
+                if (edit.getText().toString().endsWith(".c")) kwh.Highlight(words);
+                if (writeTxtToFile(editText.getText().toString(), edit.getText().toString())) {
                     Toast.makeText(miniEditor.this, String.format("file saved in %s", path.getAbsolutePath()), Toast.LENGTH_SHORT).show();
 
                 }
@@ -259,7 +243,6 @@ public class miniEditor extends AppCompatActivity {
             editText.setText("");
             int flag = 0;
             while ((str = reader.readLine()) != null) {
-                System.out.println("aaaaaaaaaaaaaaaaaaaaa");
                 if (flag != 0) editText.append("\n");
                 editText.append(str);
                 flag = 1;
@@ -349,16 +332,13 @@ public class miniEditor extends AppCompatActivity {
     }
 
 
-
     //将SD卡文件删除
     public static void deleteFile(File file) {
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             if (file.exists()) {
                 if (file.isFile()) {
                     file.delete();
-                }
-
-                else if (file.isDirectory()) {
+                } else if (file.isDirectory()) {
                     File files[] = file.listFiles();
                     for (int i = 0; i < files.length; i++) {
                         deleteFile(files[i]);

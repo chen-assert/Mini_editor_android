@@ -30,7 +30,7 @@
         android:ems="20"
         android:gravity="center|left"
         android:hint="enter some text"
-        android:inputType="textMultiLine"
+        android:inputType="textMultiLine|textNoSuggestions"
         android:lineSpacingExtra="2sp"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintLeft_toLeftOf="parent"
