@@ -8,10 +8,10 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         tools:context="jingruichen.mini_editor.miniEditor"
         android:ems="20"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         app:layout_constraintTop_toBottomOf="@+id/my_toolbar">
-        <!--app:layout_constraintHorizontal_chainStyle="spread_inside"
+    <!--app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintLeft_toLeftOf="parent"
         android:layout_marginLeft="16dp"
         android:layout_marginStart="16dp"
@@ -20,55 +20,56 @@
 
 
     <jingruichen.mini_editor.MyEditText
-        android:id="@+id/editText"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="10px"
-        android:layout_marginTop="20px"
-        android:background="@null"
-        android:cursorVisible="true"
-        android:ems="20"
-        android:gravity="center|left"
-        android:hint="enter some text"
-        android:inputType="textMultiLine|textNoSuggestions"
-        android:lineSpacingExtra="2sp"
-        app:layout_constraintHorizontal_chainStyle="spread_inside"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/my_toolbar" >
+            android:id="@+id/editText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:background="@null"
+            android:cursorVisible="true"
+            android:gravity="left"
+            android:hint="enter some text"
+            android:inputType="textMultiLine|textNoSuggestions"
+            android:lineSpacingExtra="2sp"
+            app:layout_constraintHorizontal_chainStyle="spread_inside"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/my_toolbar"
+            app:layout_constraintEnd_toEndOf="parent">
     </jingruichen.mini_editor.MyEditText>
 
 
     <Button
-        android:id="@+id/save"
-        android:layout_width="94dp"
-        android:layout_height="48dp"
-        android:layout_marginEnd="108dp"
-        android:layout_marginTop="32dp"
-        android:text="Save"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+            android:id="@+id/save"
+            android:layout_width="90dp"
+            android:layout_height="60dp"
+            android:layout_marginEnd="80dp"
+            android:layout_marginTop="0dp"
+            android:text="Save"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
 
     <TextView
-        android:id="@+id/tv"
-        android:layout_width="23dp"
-        android:layout_height="489dp"
-        android:textSize="12sp"
-        tools:layout_editor_absoluteY="85dp"></TextView>
+            android:id="@+id/tv"
+            android:layout_width="23dp"
+            android:layout_height="0dp"
+            android:textSize="12sp"
+            app:layout_constraintTop_toBottomOf="@+id/my_toolbar"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            ></TextView>
 
 
     <android.support.v7.widget.Toolbar
             android:id="@+id/my_toolbar"
             android:layout_width="0dp"
-            android:layout_height="82dp"
+            android:layout_height="60dp"
             android:background="?attr/colorPrimary"
-            app:layout_constraintHorizontal_bias="0.481"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:logo="@drawable/snowflake"
             />
-
 
 
 </android.support.constraint.ConstraintLayout>

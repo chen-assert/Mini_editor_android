@@ -18,7 +18,7 @@ public class MyEditText extends AppCompatEditText {
         super(context,as);
         setFocusable(true);
         setGravity(Gravity.TOP);
-        setPadding(95,0,0,0);
+        setPadding(75,0,0,0);
     }
 
     protected void onDraw(final Canvas canvas){
