@@ -77,8 +77,9 @@ public class miniEditor extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         myToolbar.setTitle("miniEditor");
-        myToolbar.setTitleTextColor(Color.MAGENTA);
-        myToolbar.setBackgroundColor(Color.CYAN);
+        myToolbar.setTitleTextColor(Color.BLACK);
+        myToolbar.setBackgroundColor(0xAAD2B48C);
+
         setSupportActionBar(myToolbar);
         //myToolbar.setLogo(R.drawable.snowflake);
 
@@ -91,7 +92,7 @@ public class miniEditor extends AppCompatActivity {
     private void initView() {
         editText = (EditText) findViewById(R.id.editText);
         button = (Button) findViewById(R.id.save);
-        button.setBackgroundColor(Color.WHITE);
+        button.setBackgroundColor(0xFFFFF5EE);
         button.setTextColor(Color.BLACK);
 
         words = new ArrayList<String>();
@@ -260,7 +261,6 @@ public class miniEditor extends AppCompatActivity {
         AlertDialog d2 = builder.create();
         d2.show();
     }
-
 
     private void replace(String old,String cur){
         if(words == null){
