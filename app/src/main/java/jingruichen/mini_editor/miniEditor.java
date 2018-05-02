@@ -19,7 +19,9 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Build;
 import android.os.Environment;
+import android.os.PersistableBundle;
 import android.os.StrictMode;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -60,7 +62,6 @@ public class miniEditor extends AppCompatActivity {
             "android.permission.READ_EXTERNAL_STORAGE",
             "android.permission.WRITE_EXTERNAL_STORAGE"};
 
-
     public static void verifyStoragePermissions(AppCompatActivity activity) {
         try {
             int permission = ActivityCompat.checkSelfPermission(activity,
@@ -86,6 +87,15 @@ public class miniEditor extends AppCompatActivity {
 
         verifyStoragePermissions(this);
         initView();
+
+        Button buttoni = (Button) findViewById(R.id.index);
+        buttoni.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(miniEditor.this, IndexActivity.class);
+                startActivity(intent);
+            }
+        });
 
     }
 
@@ -142,7 +152,6 @@ public class miniEditor extends AppCompatActivity {
         editText.setText(newContent);
         editText.setSelection(newContent.length());
     }
-
 
 
     /**

@@ -49,6 +49,18 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <Button
+        android:id="@+id/index"
+        android:layout_width="70dp"
+        android:layout_height="48dp"
+        android:padding="15dp"
+        android:text="INDEX"
+        android:textColor="#ffffff"
+        android:background="#000"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
     <TextView
         android:id="@+id/tv"
         android:layout_width="23dp"
