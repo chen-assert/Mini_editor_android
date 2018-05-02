@@ -45,7 +45,7 @@ public class miniEditor extends AppCompatActivity {
     File path = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) + "/save/");
     public static final String EXTRA_MESSAGE = "jingruichen.mini_editor.Message";
     private Button button;
-    private EditText editText;
+    protected EditText editText;
     private File file;
     private String filename;
     private List<String> words;
@@ -75,10 +75,10 @@ public class miniEditor extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
+        Toolbar myToolbar = findViewById(R.id.my_toolbar);
         myToolbar.setTitle("miniEditor");
-        myToolbar.setTitleTextColor(Color.MAGENTA);
-        myToolbar.setBackgroundColor(Color.CYAN);
+        myToolbar.setTitleTextColor(Color.BLACK);
+        myToolbar.setBackgroundColor(0XFFD2D48C);//CHANGED
         setSupportActionBar(myToolbar);
         //myToolbar.setLogo(R.drawable.snowflake);
 
@@ -89,9 +89,9 @@ public class miniEditor extends AppCompatActivity {
     }
 
     private void initView() {
-        editText = (EditText) findViewById(R.id.editText);
-        button = (Button) findViewById(R.id.save);
-        button.setBackgroundColor(Color.WHITE);
+        editText = findViewById(R.id.editText);
+        button = findViewById(R.id.save);
+        button.setBackgroundColor(0XFFFFF5EE);//CHANGED
         button.setTextColor(Color.BLACK);
 
         words = new ArrayList<String>();
@@ -277,7 +277,7 @@ public class miniEditor extends AppCompatActivity {
 
     public void display(){
 
-        ListView lv = (ListView)findViewById(R.id.lv);
+        ListView lv = findViewById(R.id.lv);
         List<String> name = new ArrayList<>();
         if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
             File path = Environment.getExternalStorageDirectory();
