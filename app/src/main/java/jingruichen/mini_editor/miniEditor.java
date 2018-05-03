@@ -1,37 +1,45 @@
 package jingruichen.mini_editor;
 
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.RandomAccessFile;
+import java.io.*;
 import java.lang.String;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import android.app.Activity;
+import android.net.Uri;
+import android.net.Uri.Builder;
 import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.os.Build;
 import android.os.Environment;
+import android.os.PersistableBundle;
+import android.os.StrictMode;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.text.SpannableString;
-import android.text.SpannableStringBuilder;
-import android.text.Spanned;
+import android.text.*;
 import android.text.style.ForegroundColorSpan;
+import android.text.style.LeadingMarginSpan;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.Button;
 import android.util.Log;
@@ -42,32 +50,27 @@ import android.support.v7.app.AlertDialog;
 import android.support.constraint.ConstraintLayout;
 
 public class miniEditor extends AppCompatActivity {
+    protected static final int REC_REQUESTCODE = 0;
     File path = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) + "/save/");
-    public static final String EXTRA_MESSAGE = "jingruichen.mini_editor.Message";
-    private Button button;
-    protected EditText editText;
-    private File file;
-    private String filename;
-    private List<String> words;
-    private Map<String,String> map = new HashMap();
-    private List<Map<String,String>> MapList = new ArrayList<>();
-    private static final int REQUEST_EXTERNAL_STORAGE = 1;
-    private static String[] PERMISSIONS_STORAGE = {
+    protected static final String EXTRA_MESSAGE = "jingruichen.mini_editor.Message";
+    protected Button button;
+    protected static MyEditText editText;
+    protected File file;
+    protected List<String> words = new ArrayList<>();
+    protected static final int REQUEST_EXTERNAL_STORAGE = 1;
+    protected static String[] PERMISSIONS_STORAGE = {
             "android.permission.READ_EXTERNAL_STORAGE",
             "android.permission.WRITE_EXTERNAL_STORAGE"};
 
-    //需要为SD卡的写入申请动态权限
     public static void verifyStoragePermissions(AppCompatActivity activity) {
         try {
-            //检测是否有写的权限
             int permission = ActivityCompat.checkSelfPermission(activity,
                     "android.permission.WRITE_EXTERNAL_STORAGE");
             if (permission != PackageManager.PERMISSION_GRANTED) {
-                // 没有写的权限，去申请写的权限，会弹出对话框
                 ActivityCompat.requestPermissions(activity, PERMISSIONS_STORAGE, REQUEST_EXTERNAL_STORAGE);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception editText) {
+            editText.printStackTrace();
         }
     }
 
@@ -75,83 +78,134 @@ public class miniEditor extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar myToolbar = findViewById(R.id.my_toolbar);
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         myToolbar.setTitle("miniEditor");
-        myToolbar.setTitleTextColor(Color.BLACK);
-        myToolbar.setBackgroundColor(0XFFD2D48C);//CHANGED
+        myToolbar.setTitleTextColor(Color.MAGENTA);
+        myToolbar.setBackgroundColor(Color.CYAN);
         setSupportActionBar(myToolbar);
-        //myToolbar.setLogo(R.drawable.snowflake);
 
 
         verifyStoragePermissions(this);
         initView();
 
+        Button buttoni = (Button) findViewById(R.id.index);
+        buttoni.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(miniEditor.this, IndexActivity.class);
+                startActivity(intent);
+            }
+        });
+
     }
 
-    private void initView() {
+    protected void initView() {
         editText = findViewById(R.id.editText);
-        button = findViewById(R.id.save);
-        button.setBackgroundColor(0XFFFFF5EE);//CHANGED
+        button = (Button) findViewById(R.id.save);
+        button.setBackgroundColor(Color.WHITE);
         button.setTextColor(Color.BLACK);
 
-        words = new ArrayList<String>();
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 showDialog();
-                writeTxtToFile(editText.getText().toString());
-                Toast.makeText(miniEditor.this, String.format("file saved in %s", path.getAbsolutePath()), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
+
+        editText.addTextChangedListener(new TextWatcher() {
+            int sj = 0;
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                //Toast.makeText(miniEditor.this, String.format("%d %d %d",start,before,count), Toast.LENGTH_SHORT).show();
+                if (count == 1) {
+                    //Toast.makeText(miniEditor.this, String.format("%c",s.charAt(start)), Toast.LENGTH_SHORT).show();
+                    char in = s.charAt(start);
+                    if (in == '{') sj++;
+                    if (in == '}') {
+                        if(sj>0) sj--;
+                    }
+                    if (in == '\n') indentation2(editText.getText().toString(),sj);
+                }
+
+
+            }
+            @Override
+            public void afterTextChanged(Editable editable) {
             }
         });
     }
 
+    public void indentation2(String content,int sj) {
+        String newContent=content;
+        for(int i=0;i<sj;i++){
+            newContent=newContent+'\t'+'\t';
+        }
+        editText.setText(newContent);
+        editText.setSelection(newContent.length());
+    }
+
+
     /**
-     * Called when the user taps the save button
+     * Called when the user taps the OK button
      */
-    public void writeTxtToFile(String strcontent) {
+    public boolean writeTxtToFile(String strcontent,String filename) {
 
         try {
             if (!path.exists()) {
                 path.mkdirs();
             }
 
-            Scanner s = new Scanner(editText.getText().toString().trim());
-            String word;
-
-            while(s.hasNext()){
-                word = s.next();
-                System.out.println(word);
-                words.add(word);
-            }
-
-
 
             file = new File(path.getAbsolutePath(),filename);
             System.out.println(path.getAbsolutePath());
-            if(!file.createNewFile()) {
-                Toast.makeText(miniEditor.this,"file already exist...",Toast.LENGTH_SHORT).show();
-                return;
+            if (!file.exists()) {
+                file.createNewFile();
+                return true;
             }
-            RandomAccessFile raf = new RandomAccessFile(file, "rwd");
-            raf.seek(file.length());
-            raf.write(strcontent.getBytes());
-            raf.close();
+            else{
+                Toast.makeText(miniEditor.this, "file already exist...", Toast.LENGTH_SHORT).show();
+            }
+            FileOutputStream fos = new FileOutputStream(file, true);
+            fos.write(strcontent.getBytes());
+            fos.close();
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception editText) {
+            editText.printStackTrace();
         }
+        return false;
     }
 
     public void showDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Enter file name");
         builder.setIcon(R.drawable.ic_favorite_black_48dp);
-        final EditText edit = new EditText(this);
-        builder.setView(edit);
-        filename = edit.getText().toString().trim();
+        ConstraintLayout constraint = (ConstraintLayout) getLayoutInflater().inflate(R.layout.dialogs_savingfiles, null);
+        builder.setView(constraint);
+        final EditText edit = constraint.findViewById(R.id.name);
+
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
+                Scanner s = new Scanner(editText.getText().toString());
+                keywordHighlighting kwh = new keywordHighlighting();
+                while(s.hasNext()){
+                    String w = s.next();
+                    System.out.println("w:"+w);
+                    words.add(w);
+                }
+                if(edit.getText().toString().endsWith(".c")) kwh.Highlight(words);
+                if (writeTxtToFile(editText.getText().toString(),edit.getText().toString())) {
+                    Toast.makeText(miniEditor.this, String.format("file saved in %s", path.getAbsolutePath()), Toast.LENGTH_SHORT).show();
+
+                }
 
             }
         });
@@ -170,9 +224,6 @@ public class miniEditor extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         switch (item.getItemId()) {
-            case R.id.action_favorite:
-                Toast.makeText(miniEditor.this, "Added to favorite", Toast.LENGTH_SHORT).show();
-                break;
 
             case R.id.action_settings:
                 setColors(builder);
@@ -181,12 +232,15 @@ public class miniEditor extends AppCompatActivity {
             case R.id.action_discard:
                 Toast.makeText(miniEditor.this, "File deleted...", Toast.LENGTH_SHORT).show();
                 deleteFile(file);
-                Toast.makeText(miniEditor.this,"File deleted...",Toast.LENGTH_SHORT).show();
+                Toast.makeText(miniEditor.this, "File deleted...", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.action_browse:
                 //show all saved files
-                display();
-
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                //now only can read .txt file?
+                intent.setType("text/plain");
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                this.startActivityForResult(intent, REC_REQUESTCODE);
                 break;
 
             case R.id.action_search_replace:
@@ -199,7 +253,34 @@ public class miniEditor extends AppCompatActivity {
 
     }
 
-    private void setColors(AlertDialog.Builder builder) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Toast.makeText(this, "uri:" + data.getData().getPath(), Toast.LENGTH_SHORT).show();
+        //Toast.makeText(miniEditor.this, "Starting read file", Toast.LENGTH_SHORT).show();
+        showInfo(data);
+    }
+
+    protected void showInfo(Intent data) {
+        String str = null;
+        try {
+            InputStream is = this.getContentResolver().openInputStream(data.getData());
+            InputStreamReader input = new InputStreamReader(is, "UTF-8");
+            BufferedReader reader = new BufferedReader(input);
+            editText.setText("");
+            int flag = 0;
+            while ((str = reader.readLine()) != null) {
+                System.out.println("aaaaaaaaaaaaaaaaaaaaa");
+                if (flag != 0) editText.append("\n");
+                editText.append(str);
+                flag = 1;
+            }
+        } catch (FileNotFoundException editText) {
+            Log.e("1", Log.getStackTraceString(editText));
+        } catch (IOException editText) {
+            Log.e("1", Log.getStackTraceString(editText));
+        }
+    }
+
+    protected void setColors(AlertDialog.Builder builder) {
         builder.setTitle("Select text color");
         builder.setIcon(R.drawable.color);
 
@@ -226,10 +307,11 @@ public class miniEditor extends AppCompatActivity {
         });
         builder.setCancelable(true);
         AlertDialog d = builder.create();
+        editText.setSelection(editText.getText().toString().length());
         d.show();
     }
 
-    private void find_and_replace(AlertDialog.Builder builder) {
+    protected void find_and_replace(AlertDialog.Builder builder) {
         builder.setTitle("Search and Replace");
         builder.setIcon(R.drawable.options);
 
@@ -243,7 +325,7 @@ public class miniEditor extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int which) {
                 final String old = edit1.getText().toString();
                 final String cur = edit2.getText().toString();
-                Log.d("old&cur", String.format("%s:%s",old,cur));
+                Log.d("old&cur", String.format("%s:%s", old, cur));
                 replace(old, cur);
             }
         });
@@ -262,63 +344,33 @@ public class miniEditor extends AppCompatActivity {
     }
 
 
-    private void replace(String old,String cur){
-        if(words == null){
+    protected void replace(String old, String cur) {
+        if (words == null) {
             System.out.println("null");
             return;
         }
 
         String text = editText.getText().toString();
-        text = text.replaceAll(old,cur);
+        text = text.replaceAll(old, cur);
         editText.setText(text);
-    }
-
-
-
-    public void display(){
-
-        ListView lv = findViewById(R.id.lv);
-        List<String> name = new ArrayList<>();
-        if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
-            File path = Environment.getExternalStorageDirectory();
-            File[] files = path.listFiles();
-            getFileName(files,name);
-        }
-        SimpleAdapter adapter = new SimpleAdapter(this,MapList,R.layout.list,new String[]{"Name"},new int[]{R.id.txt_tv});
-        lv.setAdapter(adapter);
-    }
-
-    private void getFileName(File[] files,List<String> name){
-        if(files != null){
-            for(File file:files){
-                if(file.isDirectory()){
-                    getFileName(file.listFiles(),name);
-                }
-                else{
-                    String fileName = file.getName();
-                    Log.i("zeng","file name: : "+fileName);
-                    map.put("Name",fileName);
-                    MapList.add(map);
-                }
-            }
-        }
+        System.out.println(editText.getText().toString());
+        editText.setSelection(text.length());
     }
 
 
 
     //将SD卡文件删除
-    public static void  deleteFile(File file) {
-        if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+    public static void deleteFile(File file) {
+        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             if (file.exists()) {
                 if (file.isFile()) {
                     file.delete();
                 }
-                // 如果它是一个目录
+
                 else if (file.isDirectory()) {
-                    // 声明目录下所有的文件 files[];
                     File files[] = file.listFiles();
-                    for (int i = 0; i < files.length; i++) { // 遍历目录下所有的文件
-                        deleteFile(files[i]); // 把每个文件 用这个方法进行迭代
+                    for (int i = 0; i < files.length; i++) {
+                        deleteFile(files[i]);
                     }
                 }
                 file.delete();
@@ -333,4 +385,6 @@ public class miniEditor extends AppCompatActivity {
         inflater.inflate(R.menu.main_activity_actions, menu);
         return true;
     }
+
+
 }
