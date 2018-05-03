@@ -58,17 +58,17 @@ public class miniEditor extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
+        Toolbar myToolbar = findViewById(R.id.my_toolbar);
         myToolbar.setTitle("miniEditor");
-        myToolbar.setTitleTextColor(Color.MAGENTA);
-        myToolbar.setBackgroundColor(Color.CYAN);
+        myToolbar.setTitleTextColor(0xFF8b4513);
+        myToolbar.setBackgroundColor(0xFFd2b48c);
         setSupportActionBar(myToolbar);
 
 
         verifyStoragePermissions(this);
         initView();
 
-        Button buttoni = (Button) findViewById(R.id.index);
+        Button buttoni = findViewById(R.id.index);
         buttoni.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -83,9 +83,9 @@ public class miniEditor extends AppCompatActivity {
     //close listener when change text by code
     protected void initView() {
         editText = findViewById(R.id.editText);
-        button = (Button) findViewById(R.id.save);
-        button.setBackgroundColor(Color.WHITE);
-        button.setTextColor(Color.BLACK);
+        button = findViewById(R.id.save);
+        button.setBackgroundColor(0xFFFFF5EE);
+        button.setTextColor(0xFFA52A2A);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
