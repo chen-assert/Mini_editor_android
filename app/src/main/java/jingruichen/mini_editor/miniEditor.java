@@ -28,6 +28,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.lang.reflect.Method;
 
 public class miniEditor extends AppCompatActivity {
     protected static final int REC_REQUESTCODE = 0;
@@ -49,8 +50,8 @@ public class miniEditor extends AppCompatActivity {
             if (permission != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(activity, PERMISSIONS_STORAGE, REQUEST_EXTERNAL_STORAGE);
             }
-        } catch (Exception editText) {
-            editText.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -66,6 +67,7 @@ public class miniEditor extends AppCompatActivity {
 
 
         verifyStoragePermissions(this);
+
         initView();
 
         Button buttoni = findViewById(R.id.index);
@@ -78,6 +80,7 @@ public class miniEditor extends AppCompatActivity {
         });
 
     }
+
 
 
     //close listener when change text by code
@@ -153,14 +156,7 @@ public class miniEditor extends AppCompatActivity {
 
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
-                Scanner s = new Scanner(editText.getText().toString());
-                keywordHighlighting kwh = new keywordHighlighting();
-                while (s.hasNext()) {
-                    String w = s.next();
-                    System.out.println("w:" + w);
-                    words.add(w);
-                }
-                if (edit.getText().toString().endsWith(".c")) kwh.Highlight(words);
+
                 if (writeTxtToFile(editText.getText().toString(), edit.getText().toString())) {
                     Toast.makeText(miniEditor.this, String.format("file saved in %s", path.getAbsolutePath()), Toast.LENGTH_SHORT).show();
 
@@ -185,7 +181,7 @@ public class miniEditor extends AppCompatActivity {
         switch (item.getItemId()) {
 
             case R.id.action_settings:
-                setColors(builder);
+                settings(builder);
                 break;
 
             case R.id.action_browse:
@@ -200,6 +196,15 @@ public class miniEditor extends AppCompatActivity {
                 find_and_replace(builder);
                 break;
 
+            case R.id.action_email:
+                //send the files by email
+                intent = new Intent(Intent.ACTION_SEND);
+                intent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{"voltage111@sina.com"});
+                intent.putExtra(android.content.Intent.EXTRA_SUBJECT, "SUBJECT");
+                intent.putExtra(android.content.Intent.EXTRA_TEXT, "Sending file from miniEditor...");
+                intent.setType("text/html");
+                startActivity(Intent.createChooser(intent, "Please choose your email client"));
+                break;
 
         }
         return super.onOptionsItemSelected(item);
@@ -231,6 +236,62 @@ public class miniEditor extends AppCompatActivity {
             Log.e("1", Log.getStackTraceString(editText));
         }
     }
+
+    //general settings
+    protected void settings(AlertDialog.Builder builder) {
+        builder.setTitle("Setting options");
+        builder.setIcon(R.drawable.ic_settings_black_24dp);
+        final AlertDialog.Builder color_dialog = new AlertDialog.Builder(this);
+        final AlertDialog.Builder highlight_dialog = new AlertDialog.Builder(this);
+
+        builder.setNeutralButton("Color", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                setColors(color_dialog);
+            }
+        });
+
+
+        builder.setNegativeButton("Others", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface arg0, int arg1) {
+                 setHighlight_status(highlight_dialog);
+            }
+        });
+
+        builder.setCancelable(true);
+        AlertDialog d = builder.create();
+        d.show();
+    }
+
+    protected void setHighlight_status(AlertDialog.Builder builder) {
+        builder.setTitle("Turn on KeywordHighlighting?");
+        builder.setIcon(R.drawable.options);
+        builder.setNeutralButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Scanner s = new Scanner(editText.getText().toString());
+                keywordHighlighting kwh = new keywordHighlighting();
+                while (s.hasNext()) {
+                    String w = s.next();
+                    System.out.println("w:" + w);
+                    words.add(w);
+                }
+                kwh.Highlight(words);
+            }
+        });
+
+
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface arg0, int arg1) {
+                return;
+            }
+        });
+        builder.setCancelable(true);
+        AlertDialog d = builder.create();
+        editText.setSelection(editText.getText().length());
+        d.show();
+    }
+
 
     protected void setColors(AlertDialog.Builder builder) {
         builder.setTitle("Select text color");
@@ -310,26 +371,26 @@ public class miniEditor extends AppCompatActivity {
     }
 
 
-    //将SD卡文件删除
-    public static void deleteFile(File file) {
-        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-            if (file.exists()) {
-                if (file.isFile()) {
-                    file.delete();
-                } else if (file.isDirectory()) {
-                    File files[] = file.listFiles();
-                    for (int i = 0; i < files.length; i++) {
-                        deleteFile(files[i]);
-                    }
+    @Override
+    //show icons in the menu
+    public boolean onMenuOpened(int featureId, Menu menu) {
+        if (menu != null) {
+            if (menu.getClass().getSimpleName().equalsIgnoreCase("MenuBuilder")) {
+                try {
+                    Method method = menu.getClass().getDeclaredMethod("setOptionalIconsVisible", Boolean.TYPE);
+                    method.setAccessible(true);
+                    method.invoke(menu, true);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-                file.delete();
             }
         }
+        return super.onMenuOpened(featureId, menu);
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // 为ActionBar扩展菜单项
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main_activity_actions, menu);
         return true;

@@ -92,7 +92,7 @@ public class keywordHighlighting {
                             span.setSpan(new ForegroundColorSpan(Color.MAGENTA), begin, begin + word.length(), SpannableString.SPAN_INCLUSIVE_INCLUSIVE);
                             break;
                         case "purple":
-                            span.setSpan(new ForegroundColorSpan(Color.BLUE), begin, begin + word.length(), SpannableString.SPAN_INCLUSIVE_INCLUSIVE);
+                            span.setSpan(new ForegroundColorSpan(Color.parseColor("purple")), begin, begin + word.length(), SpannableString.SPAN_INCLUSIVE_INCLUSIVE);
                             break;
                         case "grey":
                             span.setSpan(new ForegroundColorSpan(Color.GRAY), begin, begin + word.length(), SpannableString.SPAN_INCLUSIVE_INCLUSIVE);
@@ -108,4 +108,5 @@ public class keywordHighlighting {
       miniEditor.editText.setText(span);
         miniEditor.editText.setSelection(text.length());
     }
+
 }
