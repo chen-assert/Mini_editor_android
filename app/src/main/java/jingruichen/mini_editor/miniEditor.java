@@ -1,34 +1,33 @@
 package jingruichen.mini_editor;
 
-import java.io.*;
-import java.lang.String;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Scanner;
-
 import android.content.DialogInterface;
-import android.content.pm.PackageManager;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.os.Bundle;
 import android.os.Environment;
-import android.os.PersistableBundle;
-import android.os.StrictMode;
-import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.SpannableString;
 import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
-import android.view.*;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
 
 public class miniEditor extends AppCompatActivity {
     protected static final int REC_REQUESTCODE = 0;
@@ -79,15 +78,14 @@ public class miniEditor extends AppCompatActivity {
         });
 
     }
-    private int textChangeFlag=0;
+
+
     //close listener when change text by code
     protected void initView() {
         editText = findViewById(R.id.editText);
         button = (Button) findViewById(R.id.save);
         button.setBackgroundColor(Color.WHITE);
         button.setTextColor(Color.BLACK);
-
-
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -97,7 +95,7 @@ public class miniEditor extends AppCompatActivity {
 
 
         editText.addTextChangedListener(new TextWatcher() {
-            int indent = 0;
+
 
             @Override
             public void beforeTextChanged(CharSequence s, int start, int before, int count) {
@@ -106,26 +104,7 @@ public class miniEditor extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if(textChangeFlag==1)return;
-                textChangeFlag=1;
-                //Toast.makeText(miniEditor.this, String.format("%d %d %d",start,before,count), Toast.LENGTH_SHORT).show();
-                if (count == 1) {
-                    //Toast.makeText(miniEditor.this, String.format("%c",s.charAt(start)), Toast.LENGTH_SHORT).show();
-                    char in = s.charAt(start);
-                    if (in == '}') {
-                        //delete two '\t'(if possible)
-                        if (editText.getText().subSequence(Math.max(editText.length() - 5, 0), editText.length()).toString().equals("    }")) {
-                            int select=editText.getSelectionStart();
-                            editText.setText((editText.getText().delete(editText.length() - 5, editText.length())).append('}'));
-                            editText.setSelection(select-4);
-                        }
-                    }
-                    if (in == '\n') {
-                        indent=getIndent(editText);
-                        indentation(editText, indent);
-                    }
-                }
-                textChangeFlag=0;
+                jingruichen.mini_editor.indent.check(s,start,before,count);
             }
 
 
@@ -135,28 +114,6 @@ public class miniEditor extends AppCompatActivity {
         });
     }
 
-    protected int getIndent(MyEditText editText) {
-        int indent=0;
-        Editable text = editText.getText();
-        //Toast.makeText(miniEditor.this, String.format("%c",editText.getText().charAt(editText.getSelectionStart()-1)), Toast.LENGTH_SHORT).show();
-        for(int i=0;i<editText.getSelectionStart();i++){
-            if(text.charAt(i)=='{')indent++;
-            if(text.charAt(i)=='}')indent--;
-            if(indent<0)indent=0;
-        }
-        return indent;
-    }
-
-    public void indentation(MyEditText editText, int indent) {
-        String newContent = editText.getText().toString().substring(0,editText.getSelectionStart());
-        for (int i = 0; i < indent; i++) {
-            newContent = newContent + "    ";
-        }
-        newContent=newContent+editText.getText().toString().substring(editText.getSelectionStart());
-        int select=editText.getSelectionStart();
-        editText.setText(newContent);
-        editText.setSelection(select+indent*4);
-    }
 
     /**
      * Called when the user taps the OK button
@@ -173,7 +130,6 @@ public class miniEditor extends AppCompatActivity {
             System.out.println(path.getAbsolutePath());
             if (!file.exists()) {
                 file.createNewFile();
-                return true;
             } else {
                 Toast.makeText(miniEditor.this, "file already exist...", Toast.LENGTH_SHORT).show();
             }
@@ -232,15 +188,9 @@ public class miniEditor extends AppCompatActivity {
                 setColors(builder);
                 break;
 
-            case R.id.action_discard:
-                Toast.makeText(miniEditor.this, "File deleted...", Toast.LENGTH_SHORT).show();
-                deleteFile(file);
-                Toast.makeText(miniEditor.this, "File deleted...", Toast.LENGTH_SHORT).show();
-                break;
             case R.id.action_browse:
                 //show all saved files
                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                //now only can read .txt file?
                 intent.setType("text/plain");
                 intent.addCategory(Intent.CATEGORY_OPENABLE);
                 this.startActivityForResult(intent, REC_REQUESTCODE);

@@ -11,10 +11,6 @@
             android:title="@string/action_settings"
             app:showAsAction="collapseActionView"/>
     <item
-            android:id="@+id/action_discard"
-            android:title="discard(invalid)"
-            app:showAsAction="collapseActionView"/>
-    <item
             android:id="@+id/action_browse"
             android:title="browse"
             app:showAsAction="collapseActionView"/>
