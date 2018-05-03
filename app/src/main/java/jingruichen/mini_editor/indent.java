@@ -9,7 +9,7 @@ public class indent {
     private static int indent = 0;
 
     protected static void getIndent(MyEditText editText) {
-
+        indent = 0;
         Editable text = editText.getText();
         //Toast.makeText(miniEditor.this, String.format("%c",editText.getText().charAt(editText.getSelectionStart()-1)), Toast.LENGTH_SHORT).show();
         for (int i = 0; i < editText.getSelectionStart(); i++) {
