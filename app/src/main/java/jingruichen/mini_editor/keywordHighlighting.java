@@ -105,7 +105,7 @@ public class keywordHighlighting {
             }
         }
 
-        miniEditor.editText.setText((CharSequence) span);
+      miniEditor.editText.setText(span);
         miniEditor.editText.setSelection(text.length());
     }
 }

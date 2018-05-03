@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/BDIC-SE-Project_miniEditor.iml" filepath="$PROJECT_DIR$/BDIC-SE-Project_miniEditor.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/BDIC-SE-Project_miniEditort.iml" filepath="$PROJECT_DIR$/.idea/BDIC-SE-Project_miniEditort.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
