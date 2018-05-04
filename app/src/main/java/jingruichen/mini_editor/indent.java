@@ -48,6 +48,7 @@ public class indent {
             if (in == '\n') {
                 getIndent(editText);
                 indentation(editText);
+
             }
         }
         textChangeFlag = 0;

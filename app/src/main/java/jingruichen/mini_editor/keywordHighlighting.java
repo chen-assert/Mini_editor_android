@@ -1,5 +1,7 @@
 package jingruichen.mini_editor;
 
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
 import android.text.SpannableString;
 import android.graphics.Color;
@@ -104,9 +106,9 @@ public class keywordHighlighting {
 
             }
         }
-
-      miniEditor.editText.setText(span);
+        miniEditor.editText.setText(span);
         miniEditor.editText.setSelection(text.length());
+
     }
 
 }

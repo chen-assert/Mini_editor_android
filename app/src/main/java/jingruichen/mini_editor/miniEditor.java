@@ -37,7 +37,7 @@ public class miniEditor extends AppCompatActivity {
     protected Button button;
     protected static MyEditText editText;
     protected File file;
-    protected List<String> words = new ArrayList<>();
+    protected static final List<String> words = new ArrayList<>();
     protected static final int REQUEST_EXTERNAL_STORAGE = 1;
     protected static String[] PERMISSIONS_STORAGE = {
             "android.permission.READ_EXTERNAL_STORAGE",
@@ -74,8 +74,8 @@ public class miniEditor extends AppCompatActivity {
         buttoni.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(miniEditor.this, IndexActivity.class);
-                startActivity(intent);
+                //Intent intent = new Intent(miniEditor.this, IndexActivity.class);
+                //startActivity(intent);
             }
         });
 
@@ -193,7 +193,8 @@ public class miniEditor extends AppCompatActivity {
                 break;
 
             case R.id.action_search_replace:
-                find_and_replace(builder);
+                ConstraintLayout constraint = (ConstraintLayout) getLayoutInflater().inflate(R.layout.dialogs, null);
+                SearchAndReplace.find_and_replace(constraint,builder);
                 break;
 
             case R.id.action_email:
@@ -270,14 +271,31 @@ public class miniEditor extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 Scanner s = new Scanner(editText.getText().toString());
-                keywordHighlighting kwh = new keywordHighlighting();
+                final keywordHighlighting kwh = new keywordHighlighting();
                 while (s.hasNext()) {
                     String w = s.next();
                     System.out.println("w:" + w);
                     words.add(w);
                 }
                 kwh.Highlight(words);
+                editText.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+                        if(s.charAt(start) == '\n') kwh.Highlight(words);
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable s) {
+
+                    }
+                });
             }
+
         });
 
 
@@ -301,10 +319,31 @@ public class miniEditor extends AppCompatActivity {
         builder.setNeutralButton("red", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                String text = editText.getText().toString().trim();
-                SpannableString span = new SpannableString(text);
+                final String text = editText.getText().toString().trim();
+                final SpannableString span = new SpannableString(text);
                 span.setSpan(new ForegroundColorSpan(Color.RED), 0, text.length(), SpannableString.SPAN_INCLUSIVE_INCLUSIVE);
                 editText.setText(span);
+                editText.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+                        if(start < s.length() && s.charAt(start) == '\n'){
+                            span.setSpan(new ForegroundColorSpan(Color.RED), 0, text.length(), SpannableString.SPAN_INCLUSIVE_INCLUSIVE);
+                            editText.setText(span);
+                            editText.setSelection(text.length());
+                        }
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable s) {
+
+                    }
+                });
+                editText.setSelection(text.length());
             }
         });
 
@@ -312,63 +351,41 @@ public class miniEditor extends AppCompatActivity {
         //set default color
         builder.setNegativeButton("default", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface arg0, int arg1) {
-                String text = editText.getText().toString().trim();
-                SpannableString span = new SpannableString(text);
+                final String text = editText.getText().toString().trim();
+                final SpannableString span = new SpannableString(text);
                 span.setSpan(new ForegroundColorSpan(Color.BLACK), 0, text.length(), SpannableString.SPAN_INCLUSIVE_INCLUSIVE);
                 editText.setText(span);
+                editText.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+                        if(start < s.length() && s.charAt(start) == '\n'){
+                            span.setSpan(new ForegroundColorSpan(Color.BLACK), 0, text.length(), SpannableString.SPAN_INCLUSIVE_INCLUSIVE);
+                            editText.setText(span);
+                            editText.setSelection(text.length());
+                        }
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable s) {
+
+                    }
+                });
+                editText.setSelection(text.length());
             }
         });
+
         builder.setCancelable(true);
         AlertDialog d = builder.create();
         editText.setSelection(editText.getText().length());
         d.show();
     }
 
-    protected void find_and_replace(AlertDialog.Builder builder) {
-        builder.setTitle("Search and Replace");
-        builder.setIcon(R.drawable.options);
 
-        ConstraintLayout constraint = (ConstraintLayout) getLayoutInflater().inflate(R.layout.dialogs, null);
-        builder.setView(constraint);
-        final EditText edit1 = constraint.findViewById(R.id.old);
-        final EditText edit2 = constraint.findViewById(R.id.current);
-
-
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                final String old = edit1.getText().toString();
-                final String cur = edit2.getText().toString();
-                Log.d("old&cur", String.format("%s:%s", old, cur));
-                replace(old, cur);
-            }
-        });
-
-
-        builder.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Toast.makeText(miniEditor.this, "you cancelled", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        builder.setCancelable(true);
-        AlertDialog d2 = builder.create();
-        d2.show();
-    }
-
-
-    protected void replace(String old, String cur) {
-        if (words == null) {
-            System.out.println("null");
-            return;
-        }
-
-        String text = editText.getText().toString();
-        text = text.replaceAll(old, cur);
-        editText.setText(text);
-        System.out.println(editText.getText().toString());
-        editText.setSelection(text.length());
-    }
 
 
     @Override
@@ -395,6 +412,4 @@ public class miniEditor extends AppCompatActivity {
         inflater.inflate(R.menu.main_activity_actions, menu);
         return true;
     }
-
-
 }
