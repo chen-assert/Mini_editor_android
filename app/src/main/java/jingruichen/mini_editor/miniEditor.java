@@ -275,14 +275,8 @@ public class miniEditor extends AppCompatActivity {
         builder.setNeutralButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                Scanner s = new Scanner(editText.getText().toString());
                 final keywordHighlighting kwh = new keywordHighlighting();
-                while (s.hasNext()) {
-                    String w = s.next();
-                    System.out.println("w:" + w);
-                    words.add(w);
-                }
-                kwh.Highlight(words);
+                kwh.Highlight();
                 editText.addTextChangedListener(new TextWatcher() {
                     @Override
                     public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -291,7 +285,7 @@ public class miniEditor extends AppCompatActivity {
 
                     @Override
                     public void onTextChanged(CharSequence s, int start, int before, int count) {
-                        if(s.charAt(start) == '\n') kwh.Highlight(words);
+                        if(start < s.length() && s.charAt(start) == '\n') kwh.Highlight();
                     }
 
                     @Override
@@ -337,9 +331,10 @@ public class miniEditor extends AppCompatActivity {
                     @Override
                     public void onTextChanged(CharSequence s, int start, int before, int count) {
                         if(start < s.length() && s.charAt(start) == '\n'){
-                            span.setSpan(new ForegroundColorSpan(Color.RED), 0, text.length(), SpannableString.SPAN_INCLUSIVE_INCLUSIVE);
-                            editText.setText(span);
-                            editText.setSelection(text.length());
+                            SpannableString span2 = new SpannableString(s);
+                            span2.setSpan(new ForegroundColorSpan(Color.RED), 0, s.length(), SpannableString.SPAN_INCLUSIVE_INCLUSIVE);
+                            editText.setText(span2);
+                            editText.setSelection(editText.getText().toString().length());
                         }
                     }
 

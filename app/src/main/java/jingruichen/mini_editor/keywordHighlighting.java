@@ -5,8 +5,11 @@ import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
 import android.text.SpannableString;
 import android.graphics.Color;
+
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Scanner;
 import java.util.List;
 
 /**
@@ -64,10 +67,16 @@ public class keywordHighlighting {
         keyWord.put("9","blue");
     }
 
-    public void Highlight(List<String> words){
+    public void Highlight(){
         //if word is one of the keywords
 
         String text = miniEditor.editText.getText().toString();
+        Scanner s = new Scanner(text);
+        List<String> words = new ArrayList<>();
+        while(s.hasNext()){
+            String w = s.next();
+            words.add(w);
+        }
         SpannableString span = new SpannableString(text);
         for(int i=0;i<words.size();i++){
             if(keyWord.containsKey(words.get(i))) {
