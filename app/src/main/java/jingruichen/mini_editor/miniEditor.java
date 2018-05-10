@@ -212,13 +212,18 @@ public class miniEditor extends AppCompatActivity {
 
     }
 
+    //used for callback to display text
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(data==null){
+            Toast.makeText(miniEditor.this, "Not select file!", Toast.LENGTH_SHORT).show();
+            return;
+        }
         Toast.makeText(this, "uri:" + data.getData().getPath(), Toast.LENGTH_SHORT).show();
-        //Toast.makeText(miniEditor.this, "Starting read file", Toast.LENGTH_SHORT).show();
-        showInfo(data);
+
+        showText(data);
     }
 
-    protected void showInfo(Intent data) {
+    protected void showText(Intent data) {
         String str = null;
         try {
             InputStream is = this.getContentResolver().openInputStream(data.getData());

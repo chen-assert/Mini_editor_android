@@ -7,7 +7,6 @@ import static jingruichen.mini_editor.miniEditor.editText;
 public class indent {
     private static int textChangeFlag = 0;
     private static int indent = 0;
-
     protected static void getIndent(MyEditText editText) {
         indent = 0;
         Editable text = editText.getText();
