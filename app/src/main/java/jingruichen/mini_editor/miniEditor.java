@@ -25,19 +25,21 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 public class miniEditor extends AppCompatActivity {
-    protected static final int REC_REQUESTCODE = 0;
+    protected static final int FILE_REQUESTCODE = 0;
+    protected static final int LIST_REQUESTCODE = 1;
     File path = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) + "/save/");
     protected static final String EXTRA_MESSAGE = "jingruichen.mini_editor.Message";
     protected Button button;
     protected static MyEditText editText;
     protected File file;
-    protected static final List<String> words = new ArrayList<>();
+    protected static LinkedList<String> list=new LinkedList();
+    protected static final List<String> words = new ArrayList();
     protected static final int REQUEST_EXTERNAL_STORAGE = 1;
     protected static String[] PERMISSIONS_STORAGE = {
             "android.permission.READ_EXTERNAL_STORAGE",
@@ -82,7 +84,6 @@ public class miniEditor extends AppCompatActivity {
     }
 
 
-
     //close listener when change text by code
     protected void initView() {
         editText = findViewById(R.id.editText);
@@ -107,7 +108,7 @@ public class miniEditor extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                jingruichen.mini_editor.indent.check(s,start,before,count);
+                jingruichen.mini_editor.indent.check(s, start, before, count);
             }
 
 
@@ -139,7 +140,7 @@ public class miniEditor extends AppCompatActivity {
             FileOutputStream fos = new FileOutputStream(file, true);
             fos.write(strcontent.getBytes());
             fos.close();
-
+            Toast.makeText(miniEditor.this, "file saved in"+file.getAbsolutePath(), Toast.LENGTH_SHORT).show();
         } catch (Exception editText) {
             editText.printStackTrace();
         }
@@ -189,12 +190,12 @@ public class miniEditor extends AppCompatActivity {
                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
                 intent.setType("text/plain");
                 intent.addCategory(Intent.CATEGORY_OPENABLE);
-                this.startActivityForResult(intent, REC_REQUESTCODE);
+                startActivityForResult(intent, FILE_REQUESTCODE);
                 break;
 
             case R.id.action_search_replace:
                 ConstraintLayout constraint = (ConstraintLayout) getLayoutInflater().inflate(R.layout.dialogs, null);
-                SearchAndReplace.find_and_replace(constraint,builder);
+                SearchAndReplace.find_and_replace(constraint, builder);
                 break;
 
             case R.id.action_email:
@@ -207,6 +208,13 @@ public class miniEditor extends AppCompatActivity {
                 startActivity(Intent.createChooser(intent, "Please choose your email client"));
                 break;
 
+            case R.id.action_list:
+                list.clear();
+                list.addLast(file.getAbsolutePath());
+                Intent intent2 = new Intent(this, list_activity.class);
+                startActivityForResult(intent2, LIST_REQUESTCODE);
+                break;
+
         }
         return super.onOptionsItemSelected(item);
 
@@ -214,13 +222,19 @@ public class miniEditor extends AppCompatActivity {
 
     //used for callback to display text
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(data==null){
+        if (data == null) {
             Toast.makeText(miniEditor.this, "Not select file!", Toast.LENGTH_SHORT).show();
             return;
         }
-        Toast.makeText(this, "uri:" + data.getData().getPath(), Toast.LENGTH_SHORT).show();
+        if (requestCode == FILE_REQUESTCODE) {
+            Toast.makeText(this, "uri:" + data.getData().getPath(), Toast.LENGTH_SHORT).show();
 
-        showText(data);
+            showText(data);
+        }
+        else if(requestCode==LIST_REQUESTCODE){
+
+            Toast.makeText(this, "uri:" + data.getExtras().getString("path"), Toast.LENGTH_SHORT).show();
+        }
     }
 
     protected void showText(Intent data) {
@@ -260,7 +274,7 @@ public class miniEditor extends AppCompatActivity {
 
         builder.setNegativeButton("Others", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface arg0, int arg1) {
-                 setHighlight_status(highlight_dialog);
+                setHighlight_status(highlight_dialog);
             }
         });
 
@@ -285,7 +299,7 @@ public class miniEditor extends AppCompatActivity {
 
                     @Override
                     public void onTextChanged(CharSequence s, int start, int before, int count) {
-                        if(start < s.length() && s.charAt(start) == '\n') kwh.Highlight();
+                        if (start < s.length() && s.charAt(start) == '\n') kwh.Highlight();
                     }
 
                     @Override
@@ -330,7 +344,7 @@ public class miniEditor extends AppCompatActivity {
 
                     @Override
                     public void onTextChanged(CharSequence s, int start, int before, int count) {
-                        if(start < s.length() && s.charAt(start) == '\n'){
+                        if (start < s.length() && s.charAt(start) == '\n') {
                             SpannableString span2 = new SpannableString(s);
                             span2.setSpan(new ForegroundColorSpan(Color.RED), 0, s.length(), SpannableString.SPAN_INCLUSIVE_INCLUSIVE);
                             editText.setText(span2);
@@ -363,7 +377,7 @@ public class miniEditor extends AppCompatActivity {
 
                     @Override
                     public void onTextChanged(CharSequence s, int start, int before, int count) {
-                        if(start < s.length() && s.charAt(start) == '\n'){
+                        if (start < s.length() && s.charAt(start) == '\n') {
                             span.setSpan(new ForegroundColorSpan(Color.BLACK), 0, text.length(), SpannableString.SPAN_INCLUSIVE_INCLUSIVE);
                             editText.setText(span);
                             editText.setSelection(text.length());
@@ -384,8 +398,6 @@ public class miniEditor extends AppCompatActivity {
         editText.setSelection(editText.getText().length());
         d.show();
     }
-
-
 
 
     @Override
