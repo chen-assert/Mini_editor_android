@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Scanner;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by yangzixuan on 26/04/2018.
@@ -32,6 +34,7 @@ public class keywordHighlighting {
         keyWord.put("continue","red");
         keyWord.put("default","yellow");
         keyWord.put("do","purple");
+        keyWord.put("double","blue");
         keyWord.put("else","pink");
         keyWord.put("if","pink");
         keyWord.put("enum","blue");
@@ -50,21 +53,13 @@ public class keywordHighlighting {
         keyWord.put("struct","green");
         keyWord.put("typedef","green");
         keyWord.put("#define","green");
+        keyWord.put("#include<","green");
         keyWord.put("union","blue");
         keyWord.put("unsigned","blue");
         keyWord.put("void","blue");
         keyWord.put("volatile","blue");
         keyWord.put("while","purple");
-        keyWord.put("0","blue");
-        keyWord.put("1","blue");
-        keyWord.put("2","blue");
-        keyWord.put("3","blue");
-        keyWord.put("4","blue");
-        keyWord.put("5","blue");
-        keyWord.put("6","blue");
-        keyWord.put("7","blue");
-        keyWord.put("8","blue");
-        keyWord.put("9","blue");
+
     }
 
     public void Highlight(){
@@ -79,19 +74,19 @@ public class keywordHighlighting {
         }
         SpannableString span = new SpannableString(text);
         for(int i=0;i<words.size();i++){
-            if(keyWord.containsKey(words.get(i))) {
-                String word = words.get(i);
-                String color = keyWord.get(word);
+            String word = words.get(i);
+            int begin = text.indexOf(word);
+            while(begin < text.length()) {
+                if (keyWord.containsKey(word)) {
 
+                    String color = keyWord.get(word);
 
-                int begin = text.indexOf(word);
-                while(begin < text.length()) {
                     switch (color) {
                         case "red":
                             span.setSpan(new ForegroundColorSpan(Color.RED), begin, begin + word.length(), SpannableString.SPAN_INCLUSIVE_INCLUSIVE);
                             break;
                         case "blue":
-                            span.setSpan(new ForegroundColorSpan(Color.CYAN), begin, begin + word.length(), SpannableString.SPAN_INCLUSIVE_INCLUSIVE);
+                            span.setSpan(new ForegroundColorSpan(Color.BLUE), begin, begin + word.length(), SpannableString.SPAN_INCLUSIVE_INCLUSIVE);
                             break;
                         case "green":
                             span.setSpan(new ForegroundColorSpan(Color.GREEN), begin, begin + word.length(), SpannableString.SPAN_INCLUSIVE_INCLUSIVE);
@@ -109,15 +104,29 @@ public class keywordHighlighting {
                             span.setSpan(new ForegroundColorSpan(Color.GRAY), begin, begin + word.length(), SpannableString.SPAN_INCLUSIVE_INCLUSIVE);
                             break;
                     }
-                    begin = text.indexOf(word,begin + word.length());
-                    if(begin == -1) break;
+
+                }
+                if ((word.charAt(0) == '"' && word.charAt(word.length() - 1) == '"') || word.endsWith("'")) {
+                    span.setSpan(new ForegroundColorSpan(Color.GREEN), begin, begin + word.length(), SpannableString.SPAN_INCLUSIVE_INCLUSIVE);
                 }
 
+                if(isNum(word)){
+                    span.setSpan(new ForegroundColorSpan(Color.CYAN), begin, begin + word.length(), SpannableString.SPAN_INCLUSIVE_INCLUSIVE);
+                }
+
+                begin = text.indexOf(word, begin + word.length());
+                if (begin == -1) break;
             }
         }
         miniEditor.editText.setText(span);
         miniEditor.editText.setSelection(text.length());
+    }
 
+    private boolean isNum(String s){
+        Pattern p = Pattern.compile("-?[0-9]+(\\\\.[0-9]+)?");
+        Matcher m = p.matcher(s);
+        if(m.matches()) return true;
+        return false;
     }
 
 }
