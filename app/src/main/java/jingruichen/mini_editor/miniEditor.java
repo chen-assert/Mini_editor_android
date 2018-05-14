@@ -38,7 +38,7 @@ public class miniEditor extends AppCompatActivity {
     protected Button button;
     protected static MyEditText editText;
     protected File file;
-    protected static LinkedList<String> list=new LinkedList();
+    protected static LinkedList<String> list = new LinkedList();
     protected static final List<String> words = new ArrayList();
     protected static final int REQUEST_EXTERNAL_STORAGE = 1;
     protected static String[] PERMISSIONS_STORAGE = {
@@ -87,16 +87,6 @@ public class miniEditor extends AppCompatActivity {
     //close listener when change text by code
     protected void initView() {
         editText = findViewById(R.id.editText);
-        button = findViewById(R.id.save);
-        button.setBackgroundColor(0xFFFFF5EE);
-        button.setTextColor(0xFFA52A2A);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showDialog();
-            }
-        });
-
 
         editText.addTextChangedListener(new TextWatcher() {
 
@@ -140,7 +130,7 @@ public class miniEditor extends AppCompatActivity {
             FileOutputStream fos = new FileOutputStream(file, true);
             fos.write(strcontent.getBytes());
             fos.close();
-            Toast.makeText(miniEditor.this, "file saved in"+file.getAbsolutePath(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(miniEditor.this, "file saved in" + file.getAbsolutePath(), Toast.LENGTH_SHORT).show();
         } catch (Exception editText) {
             editText.printStackTrace();
         }
@@ -180,7 +170,17 @@ public class miniEditor extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         switch (item.getItemId()) {
-
+            case R.id.action_save:
+                showDialog();
+                break;
+            case R.id.action_favorite: {
+                if (file == null) {
+                    Toast.makeText(miniEditor.this, "You need to save file first", Toast.LENGTH_SHORT).show();
+                } else {
+                    list.addLast(file.getAbsolutePath());
+                }
+                break;
+            }
             case R.id.action_settings:
                 settings(builder);
                 break;
@@ -209,10 +209,10 @@ public class miniEditor extends AppCompatActivity {
                 break;
 
             case R.id.action_list:
-                list.clear();
-                list.addLast(file.getAbsolutePath());
+                //list.clear();
                 Intent intent2 = new Intent(this, list_activity.class);
                 startActivityForResult(intent2, LIST_REQUESTCODE);
+
                 break;
 
         }
@@ -230,8 +230,7 @@ public class miniEditor extends AppCompatActivity {
             Toast.makeText(this, "uri:" + data.getData().getPath(), Toast.LENGTH_SHORT).show();
 
             showText(data);
-        }
-        else if(requestCode==LIST_REQUESTCODE){
+        } else if (requestCode == LIST_REQUESTCODE) {
 
             Toast.makeText(this, "uri:" + data.getExtras().getString("path"), Toast.LENGTH_SHORT).show();
         }

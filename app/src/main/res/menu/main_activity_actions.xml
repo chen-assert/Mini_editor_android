@@ -6,6 +6,7 @@
 
 
     <!-- Settings, should always be in the overflow -->
+
     <item
             android:id="@+id/action_settings"
             android:title="@string/action_settings"
@@ -30,7 +31,17 @@
     <item
             android:id="@+id/action_list"
             android:title="list"
-            android:icon="@drawable/ic_email_black_24dp"
+            android:icon="@drawable/ic_view_list_black_24dp"
             app:showAsAction="collapseActionView"/>
+    <item
+            android:id="@+id/action_save"
+            android:title="save"
+            android:icon="@drawable/ic_action_save"
+            app:showAsAction="always"/>
+    <item
+            android:id="@+id/action_favorite"
+            android:title="@string/action_favorite"
+            android:icon="@drawable/ic_action_favorite"
+            app:showAsAction="always"/>
 
 </menu>
