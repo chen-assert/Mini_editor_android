@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.constraint.ConstraintLayout;
@@ -38,7 +39,7 @@ public class miniEditor extends AppCompatActivity {
     protected Button button;
     protected static MyEditText editText;
     protected File file;
-    protected static LinkedList<String> list = new LinkedList();
+    protected static LinkedList<Uri> list = new LinkedList();
     protected static final List<String> words = new ArrayList();
     protected static final int REQUEST_EXTERNAL_STORAGE = 1;
     protected static String[] PERMISSIONS_STORAGE = {
@@ -177,7 +178,7 @@ public class miniEditor extends AppCompatActivity {
                 if (file == null) {
                     Toast.makeText(miniEditor.this, "You need to save file first", Toast.LENGTH_SHORT).show();
                 } else {
-                    list.addLast(file.getAbsolutePath());
+                    list.addLast(Uri.fromFile(file));
                 }
                 break;
             }
@@ -228,18 +229,18 @@ public class miniEditor extends AppCompatActivity {
         }
         if (requestCode == FILE_REQUESTCODE) {
             Toast.makeText(this, "uri:" + data.getData().getPath(), Toast.LENGTH_SHORT).show();
-
-            showText(data);
+            showText(data.getData());
         } else if (requestCode == LIST_REQUESTCODE) {
+            Toast.makeText(this, "uri:" + data.getExtras().get("path"), Toast.LENGTH_SHORT).show();
+            showText((Uri) data.getExtras().get("path"));
 
-            Toast.makeText(this, "uri:" + data.getExtras().getString("path"), Toast.LENGTH_SHORT).show();
         }
     }
 
-    protected void showText(Intent data) {
+    protected void showText(Uri uri) {
         String str = null;
         try {
-            InputStream is = this.getContentResolver().openInputStream(data.getData());
+            InputStream is = this.getContentResolver().openInputStream(uri);
             InputStreamReader input = new InputStreamReader(is, "UTF-8");
             BufferedReader reader = new BufferedReader(input);
             editText.setText("");

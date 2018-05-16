@@ -2,6 +2,7 @@ package jingruichen.mini_editor;
 
 import android.app.ListActivity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -10,7 +11,7 @@ import android.widget.ListView;
 import java.util.LinkedList;
 
 public class list_activity extends ListActivity {
-    LinkedList<String> data = miniEditor.list;
+    LinkedList<Uri> data = miniEditor.list;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
