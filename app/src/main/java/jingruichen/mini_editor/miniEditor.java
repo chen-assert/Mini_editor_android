@@ -20,7 +20,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -70,20 +69,14 @@ public class miniEditor extends AppCompatActivity {
         myToolbar.setTitleTextColor(0xFF8b4513);
         myToolbar.setBackgroundColor(0xFFd2b48c);
         setSupportActionBar(myToolbar);
+
+
         list = (LinkedList<String>) getBean(this, "123");
 
         verifyStoragePermissions(this);
 
         initView();
 
-        Button buttoni = findViewById(R.id.index);
-        buttoni.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //Intent intent = new Intent(miniEditor.this, IndexActivity.class);
-                //startActivity(intent);
-            }
-        });
 
     }
 
@@ -209,7 +202,6 @@ public class miniEditor extends AppCompatActivity {
                 break;
             case R.id.action_browse:
                 //show all saved files
-
                 intent = new Intent(Intent.ACTION_GET_CONTENT);
                 intent.setType("text/plain");
                 intent.addCategory(Intent.CATEGORY_OPENABLE);

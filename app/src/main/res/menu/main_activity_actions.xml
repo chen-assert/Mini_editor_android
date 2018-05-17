@@ -26,12 +26,12 @@
     <item
             android:id="@+id/action_email"
             android:title="email"
-            android:icon="@drawable/ic_email_black_24dp"
+            android:icon="@drawable/ic_action_email"
             app:showAsAction="collapseActionView"/>
     <item
             android:id="@+id/action_list"
             android:title="list"
-            android:icon="@drawable/ic_view_list_black_24dp"
+            android:icon="@drawable/ic_action_list"
             app:showAsAction="collapseActionView"/>
     <item
             android:id="@+id/action_save"
