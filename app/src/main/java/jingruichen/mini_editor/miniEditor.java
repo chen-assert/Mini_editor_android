@@ -31,6 +31,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import static jingruichen.mini_editor.presistenceSave.getBean;
+
 public class miniEditor extends AppCompatActivity {
     protected static final int FILE_REQUESTCODE = 0;
     protected static final int LIST_REQUESTCODE = 1;
@@ -39,9 +41,10 @@ public class miniEditor extends AppCompatActivity {
     protected Button button;
     protected static MyEditText editText;
     protected File file;
-    protected static LinkedList<Uri> list = new LinkedList();
+    protected static LinkedList<String> list;
     protected static final List<String> words = new ArrayList();
     protected static final int REQUEST_EXTERNAL_STORAGE = 1;
+    protected static Intent intent;
     protected static String[] PERMISSIONS_STORAGE = {
             "android.permission.READ_EXTERNAL_STORAGE",
             "android.permission.WRITE_EXTERNAL_STORAGE"};
@@ -67,7 +70,7 @@ public class miniEditor extends AppCompatActivity {
         myToolbar.setTitleTextColor(0xFF8b4513);
         myToolbar.setBackgroundColor(0xFFd2b48c);
         setSupportActionBar(myToolbar);
-
+        list = (LinkedList<String>) getBean(this, "123");
 
         verifyStoragePermissions(this);
 
@@ -178,20 +181,16 @@ public class miniEditor extends AppCompatActivity {
                 if (file == null) {
                     Toast.makeText(miniEditor.this, "You need to save file first", Toast.LENGTH_SHORT).show();
                 } else {
-                    list.addLast(Uri.fromFile(file));
+                    if (list == null) list = new LinkedList<>();
+                    list.addLast(Uri.fromFile(file).toString());
+                }
+                if (list instanceof Serializable) {
+                    presistenceSave.putBean(this, "123", list);
                 }
                 break;
             }
             case R.id.action_settings:
                 settings(builder);
-                break;
-
-            case R.id.action_browse:
-                //show all saved files
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.setType("text/plain");
-                intent.addCategory(Intent.CATEGORY_OPENABLE);
-                startActivityForResult(intent, FILE_REQUESTCODE);
                 break;
 
             case R.id.action_search_replace:
@@ -208,12 +207,18 @@ public class miniEditor extends AppCompatActivity {
                 intent.setType("text/html");
                 startActivity(Intent.createChooser(intent, "Please choose your email client"));
                 break;
+            case R.id.action_browse:
+                //show all saved files
 
+                intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("text/plain");
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                startActivityForResult(intent, FILE_REQUESTCODE);
+                break;
             case R.id.action_list:
-                //list.clear();
+                if (list == null) list = new LinkedList<>();
                 Intent intent2 = new Intent(this, list_activity.class);
                 startActivityForResult(intent2, LIST_REQUESTCODE);
-
                 break;
 
         }

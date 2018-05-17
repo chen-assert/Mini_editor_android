@@ -11,7 +11,7 @@ import android.widget.ListView;
 import java.util.LinkedList;
 
 public class list_activity extends ListActivity {
-    LinkedList<Uri> data = miniEditor.list;
+    LinkedList<String> data = miniEditor.list;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -29,7 +29,7 @@ public class list_activity extends ListActivity {
         super.onListItemClick(l, v, position, id);
         //Toast.makeText(list_activity.this,"点中了第"+id+"个,内容是"+ data[(int)id],Toast.LENGTH_SHORT).show();
         Intent intent =getIntent();
-        intent.putExtra("path",data.get((int)id));
+        intent.putExtra("path", Uri.parse(data.get((int)id)));
         setResult(0,intent);
         finish();
     }
