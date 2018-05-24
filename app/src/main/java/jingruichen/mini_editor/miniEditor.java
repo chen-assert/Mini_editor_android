@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import static jingruichen.mini_editor.PresistenceSave.getBean;
+import static jingruichen.mini_editor.presistenceSave.getBean;
 
 public class miniEditor extends AppCompatActivity {
     protected static final int FILE_REQUESTCODE = 0;
@@ -71,7 +71,7 @@ public class miniEditor extends AppCompatActivity {
         setSupportActionBar(myToolbar);
 
 
-        list = (LinkedList<String>) PresistenceSave.getBean(this, "123");
+        list = (LinkedList<String>) getBean(this, "123");
 
         verifyStoragePermissions(this);
 
@@ -95,7 +95,7 @@ public class miniEditor extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                jingruichen.mini_editor.indent.check(s, start, before, count);
+                jingruichen.mini_editor.Indent.check(s, start, before, count);
             }
 
 
@@ -178,7 +178,7 @@ public class miniEditor extends AppCompatActivity {
                     list.addLast(Uri.fromFile(file).toString());
                 }
                 if (list instanceof Serializable) {
-                    PresistenceSave.putBean(this, "123", list);
+                    presistenceSave.putBean(this, "123", list);
                 }
                 break;
             }

@@ -6,7 +6,7 @@ import android.util.Base64;
 
 import java.io.*;
 
-public class PresistenceSave {
+public class presistenceSave {
     /*static AppCompatActivity activity;
     public static void setActivity(AppCompatActivity act){
         activity=act;
