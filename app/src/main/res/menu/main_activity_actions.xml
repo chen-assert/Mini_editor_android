@@ -10,28 +10,28 @@
     <item
             android:id="@+id/action_settings"
             android:title="@string/action_settings"
-            android:icon="@drawable/ic_settings_black_24dp"
+            android:icon="@drawable/baseline_settings_black_48dp"
             app:showAsAction="collapseActionView"/>
     <item
             android:id="@+id/action_browse"
             android:title="browse"
-            android:icon="@drawable/ic_menu_black_24dp"
+            android:icon="@drawable/baseline_explore_black_48dp"
             app:showAsAction="collapseActionView"/>
     <item
             android:id="@+id/action_search_replace"
             android:title="search and replace"
-            android:icon="@drawable/ic_search_black_24dp"
+            android:icon="@drawable/baseline_find_replace_black_48dp"
             app:showAsAction="collapseActionView"/>
 
     <item
             android:id="@+id/action_email"
             android:title="email"
-            android:icon="@drawable/ic_action_email"
+            android:icon="@drawable/baseline_mail_black_48dp"
             app:showAsAction="collapseActionView"/>
     <item
             android:id="@+id/action_list"
             android:title="list"
-            android:icon="@drawable/ic_action_list"
+            android:icon="@drawable/baseline_list_black_48dp"
             app:showAsAction="collapseActionView"/>
     <item
             android:id="@+id/action_save"
