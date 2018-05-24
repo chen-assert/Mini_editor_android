@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import static jingruichen.mini_editor.presistenceSave.getBean;
+import static jingruichen.mini_editor.PresistenceSave.getBean;
 
 public class miniEditor extends AppCompatActivity {
     protected static final int FILE_REQUESTCODE = 0;
@@ -71,7 +71,7 @@ public class miniEditor extends AppCompatActivity {
         setSupportActionBar(myToolbar);
 
 
-        list = (LinkedList<String>) getBean(this, "123");
+        list = (LinkedList<String>) PresistenceSave.getBean(this, "123");
 
         verifyStoragePermissions(this);
 
@@ -178,7 +178,7 @@ public class miniEditor extends AppCompatActivity {
                     list.addLast(Uri.fromFile(file).toString());
                 }
                 if (list instanceof Serializable) {
-                    presistenceSave.putBean(this, "123", list);
+                    PresistenceSave.putBean(this, "123", list);
                 }
                 break;
             }
@@ -286,7 +286,7 @@ public class miniEditor extends AppCompatActivity {
         builder.setNeutralButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                final keywordHighlighting kwh = new keywordHighlighting();
+                final KeywordHighlighting kwh = new KeywordHighlighting();
                 kwh.Highlight();
                 editText.addTextChangedListener(new TextWatcher() {
                     @Override

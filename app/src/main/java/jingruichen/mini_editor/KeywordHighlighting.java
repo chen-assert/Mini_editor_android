@@ -18,13 +18,13 @@ import java.util.regex.Pattern;
  * Created by yangzixuan on 26/04/2018.
  */
 
-public class keywordHighlighting {
+public class KeywordHighlighting {
 
     //a map to store keywords and the corresponding text color
     public static Map<String,String> keyWord = new HashMap<>();
 
     //store all the C keywords in the map
-    public keywordHighlighting(){
+    public KeywordHighlighting(){
         keyWord.put("auto","blue");
         keyWord.put("break","red");
         keyWord.put("case","yellow");
