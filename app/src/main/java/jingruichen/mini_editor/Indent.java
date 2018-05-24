@@ -4,7 +4,7 @@ import android.text.Editable;
 
 import static jingruichen.mini_editor.miniEditor.editText;
 
-public class indent {
+public class Indent {
     private static int textChangeFlag = 0;
     private static int indent = 0;
     protected static void getIndent(MyEditText editText) {
