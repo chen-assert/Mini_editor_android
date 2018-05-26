@@ -89,7 +89,7 @@ public class KeywordHighlighting {
                         case "pink":
                             span.setSpan(new ForegroundColorSpan(Color.MAGENTA), begin, begin + word.length(), SpannableString.SPAN_INCLUSIVE_INCLUSIVE);
                             break;
-                        case "purple":
+                        case "purple": 
                             span.setSpan(new ForegroundColorSpan(Color.parseColor("purple")), begin, begin + word.length(), SpannableString.SPAN_INCLUSIVE_INCLUSIVE);
                             break;
                     }
