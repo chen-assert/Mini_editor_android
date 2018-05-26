@@ -19,13 +19,13 @@
             app:showAsAction="collapseActionView"/>
     <item
             android:id="@+id/action_search_replace"
-            android:title="search and replace"
+            android:title="search or replace"
             android:icon="@drawable/baseline_find_replace_black_48dp"
             app:showAsAction="collapseActionView"/>
 
     <item
             android:id="@+id/action_email"
-            android:title="email"
+            android:title="send by email"
             android:icon="@drawable/baseline_mail_black_48dp"
             app:showAsAction="collapseActionView"/>
     <item
