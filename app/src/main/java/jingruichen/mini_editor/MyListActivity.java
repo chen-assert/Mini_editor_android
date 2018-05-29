@@ -1,6 +1,5 @@
 package jingruichen.mini_editor;
 
-import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -13,7 +12,7 @@ import android.widget.ListView;
 import java.io.Serializable;
 import java.util.LinkedList;
 
-public class list_activity extends ListActivity {
+public class MyListActivity extends android.app.ListActivity {
     LinkedList<String> data;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,7 +29,7 @@ public class list_activity extends ListActivity {
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
-        //Toast.makeText(list_activity.this,"点中了第"+id+"个,内容是"+ data[(int)id],Toast.LENGTH_SHORT).show();
+        //Toast.makeText(MyListActivity.this,"点中了第"+id+"个,内容是"+ data[(int)id],Toast.LENGTH_SHORT).show();
         Intent intent =getIntent();
         intent.putExtra("path",data.get((int)id));
         setResult(0,intent);
@@ -46,7 +45,7 @@ public class list_activity extends ListActivity {
             case R.id.action_delete:{
                 data.clear();
                 if (data instanceof Serializable) {
-                    presistenceSave.putBean(this, "123", data);
+                    PresistenceSave.putBean(this, "123", data);
                 }
                 ArrayAdapter arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, data);
                 setListAdapter(arrayAdapter);

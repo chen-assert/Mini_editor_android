@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import static jingruichen.mini_editor.presistenceSave.getBean;
+import static jingruichen.mini_editor.PresistenceSave.getBean;
 
 public class miniEditor extends AppCompatActivity {
     protected static final int FILE_REQUESTCODE = 0;
@@ -178,7 +178,7 @@ public class miniEditor extends AppCompatActivity {
                     list.addLast(Uri.fromFile(file).toString());
                 }
                 if (list instanceof Serializable) {
-                    presistenceSave.putBean(this, "123", list);
+                    PresistenceSave.putBean(this, "123", list);
                 }
                 break;
             }
@@ -209,7 +209,7 @@ public class miniEditor extends AppCompatActivity {
                 break;
             case R.id.action_list:
                 if (list == null) list = new LinkedList<>();
-                Intent intent2 = new Intent(this, list_activity.class);
+                Intent intent2 = new Intent(this, MyListActivity.class);
                 startActivityForResult(intent2, LIST_REQUESTCODE);
                 break;
 
