@@ -38,8 +38,8 @@ public class list_activity extends ListActivity {
             setResult(0, intent);
         }
         else{
-            data.remove((int)id);
             Toast.makeText(this,"file "+data.get((int)id)+" is deleted",Toast.LENGTH_SHORT).show();
+            data.remove((int)id);
         }
         finish();
     }
