@@ -14,7 +14,7 @@ import android.widget.Toast;
 import java.io.Serializable;
 import java.util.LinkedList;
 
-public class list_activity extends ListActivity {
+public class MyListActivity extends ListActivity {
     LinkedList<String> data;
     boolean delete = false;
     @Override
@@ -54,11 +54,11 @@ public class list_activity extends ListActivity {
         switch (item.getItemId()) {
             case R.id.action_delete:{
                 delete = true;
-                ArrayAdapter arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_multiple_choice, data);
+                ArrayAdapter arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_single_choice, data);
                 setListAdapter(arrayAdapter);
                 //data.clear();
                 if (data instanceof Serializable) {
-                    presistenceSave.putBean(this, "123", data);
+                    PresistenceSave.putBean(this, "123", data);
                 }
                 break;
             }
