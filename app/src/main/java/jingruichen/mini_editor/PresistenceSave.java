@@ -7,15 +7,11 @@ import android.util.Base64;
 import java.io.*;
 
 public class PresistenceSave {
-    /*static AppCompatActivity activity;
-    public static void setActivity(AppCompatActivity act){
-        activity=act;
-    }*/
     /**
-     * 存放实体类以及任意类型
-     * @param context 上下文对象
-     * @param key
-     * @param obj
+     * using to save instance class or any other data type
+     * @param context operateing page
+     * @param key save key
+     * @param obj the saving object
      */
     public static void putBean(Context context, String key, Object obj) {
         if (obj instanceof Serializable) {
