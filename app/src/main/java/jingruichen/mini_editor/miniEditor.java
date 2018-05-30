@@ -4,6 +4,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import java.util.HashMap;
+import java.util.Map;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -20,9 +22,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+import android.graphics.Canvas;
 
 import java.io.*;
 import java.lang.reflect.Method;
@@ -229,8 +234,7 @@ public class miniEditor extends AppCompatActivity {
             showText(data.getData());
         } else if (requestCode == LIST_REQUESTCODE) {
             Toast.makeText(this, "uri:" + data.getExtras().get("path"), Toast.LENGTH_SHORT).show();
-            showText((Uri) data.getExtras().get("path"));
-
+            showText(Uri.parse((String)data.getExtras().get("path")));
         }
     }
 

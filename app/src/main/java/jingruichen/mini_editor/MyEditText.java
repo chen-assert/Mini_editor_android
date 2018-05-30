@@ -42,5 +42,7 @@ public class MyEditText extends AppCompatEditText {
     public void setBackground(Drawable background) {
         super.setBackground(null);
     }
+
+
 }
 

@@ -6,7 +6,7 @@ import static jingruichen.mini_editor.miniEditor.editText;
 
 public class Indent {
     private static int textChangeFlag = 0;
-    private static int indent = 0;
+    private static int indent = 0;       //number of space in the front of  each line
     protected static void getIndent(MyEditText editText) {
         indent = 0;
         Editable text = editText.getText();
@@ -19,6 +19,7 @@ public class Indent {
         return;
     }
 
+    //change the current text to correct indentation
     protected static void indentation(MyEditText editText) {
         String newContent = editText.getText().toString().substring(0, editText.getSelectionStart());
         for (int i = 0; i < indent; i++) {
