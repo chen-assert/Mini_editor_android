@@ -18,7 +18,8 @@ public class presistenceSave {
      * @param obj
      */
     public static void putBean(Context context, String key, Object obj) {
-        if (obj instanceof Serializable) {// obj必须实现Serializable接口，否则会出问题
+        if (obj instanceof Serializable) {
+            // obj must implement Serializable interface, otherwise there will be problems
             try {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 ObjectOutputStream oos = new ObjectOutputStream(baos);
@@ -33,7 +34,7 @@ public class presistenceSave {
 
         } else {
             throw new IllegalArgumentException(
-                    "the obj must implement Serializble");
+                    "the obj must implement Serializable");
         }
 
     }

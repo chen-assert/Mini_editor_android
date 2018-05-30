@@ -6,7 +6,7 @@
 
     <item
             android:id="@+id/action_delete"
-            android:title="delete all"
+            android:title="delete"
             android:icon="@drawable/ic_action_save"
             app:showAsAction="always"/>
 

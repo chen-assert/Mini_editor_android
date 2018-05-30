@@ -9,33 +9,42 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.io.Serializable;
 import java.util.LinkedList;
 
 public class list_activity extends ListActivity {
     LinkedList<String> data;
+    boolean delete = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //1.数据源
+        //1.data source
         data = miniEditor.list;
-        //2.适配器
+        //2.adapter
         @SuppressWarnings("unchecked")
         ArrayAdapter arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, data);
-        //3.绑定
+        //3.bind
         setListAdapter(arrayAdapter);
     }
 
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
-        //Toast.makeText(list_activity.this,"点中了第"+id+"个,内容是"+ data[(int)id],Toast.LENGTH_SHORT).show();
-        Intent intent =getIntent();
-        intent.putExtra("path",data.get((int)id));
-        setResult(0,intent);
+        if(delete == false) {
+            Intent intent = getIntent();
+            intent.putExtra("path", data.get((int) id));
+            setResult(0, intent);
+        }
+        else{
+            data.remove((int)id);
+            Toast.makeText(this,"file "+data.get((int)id)+" is deleted",Toast.LENGTH_SHORT).show();
+        }
         finish();
     }
+
+
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.list_activity_actions, menu);
@@ -44,12 +53,13 @@ public class list_activity extends ListActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_delete:{
-                data.clear();
+                delete = true;
+                ArrayAdapter arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_multiple_choice, data);
+                setListAdapter(arrayAdapter);
+                //data.clear();
                 if (data instanceof Serializable) {
                     presistenceSave.putBean(this, "123", data);
                 }
-                ArrayAdapter arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, data);
-                setListAdapter(arrayAdapter);
                 break;
             }
         }
