@@ -4,8 +4,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import java.util.HashMap;
-import java.util.Map;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -22,12 +20,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-import android.graphics.Canvas;
 
 import java.io.*;
 import java.lang.reflect.Method;
@@ -181,6 +176,8 @@ public class miniEditor extends AppCompatActivity {
                 } else {
                     if (list == null) list = new LinkedList<>();
                     list.addLast(Uri.fromFile(file).toString());
+                    Toast.makeText(this, "add " + file.getName()+" to favorite!", Toast.LENGTH_SHORT).show();
+
                 }
                 if (list instanceof Serializable) {
                     PresistenceSave.putBean(this, "123", list);

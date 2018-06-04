@@ -1,18 +1,14 @@
 package jingruichen.mini_editor;
 
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.text.style.ForegroundColorSpan;
-import android.text.SpannableString;
 import android.graphics.Color;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Scanner;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static jingruichen.mini_editor.miniEditor.editText;
 
 /**
  * Created by yangzixuan on 26/04/2018.
@@ -25,6 +21,8 @@ public class KeywordHighlighting {
 
     //store all the C keywords in the map
     public KeywordHighlighting(){
+        keyWord.put("printf","purple");
+        keyWord.put("scanf","purple");
         keyWord.put("auto","blue");
         keyWord.put("break","red");
         keyWord.put("case","purple");
@@ -58,12 +56,13 @@ public class KeywordHighlighting {
         keyWord.put("volatile","blue");
         keyWord.put("while","pink");
 
+
     }
 
     public void Highlight(){
         //if word is one of the keywords
-
-        String text = miniEditor.editText.getText().toString();
+        int select = editText.getSelectionStart();
+        String text = editText.getText().toString();
         Scanner s = new Scanner(text);
         List<String> words = new ArrayList<>();
         while(s.hasNext()){
@@ -92,6 +91,12 @@ public class KeywordHighlighting {
                         case "purple": 
                             span.setSpan(new ForegroundColorSpan(Color.parseColor("purple")), begin, begin + word.length(), SpannableString.SPAN_INCLUSIVE_INCLUSIVE);
                             break;
+                        case "greem":
+                            span.setSpan(new ForegroundColorSpan(Color.GREEN), begin, begin + word.length(), SpannableString.SPAN_INCLUSIVE_INCLUSIVE);
+                            break;
+                        case "gray":
+                            span.setSpan(new ForegroundColorSpan(Color.parseColor("grey")), begin, begin + word.length(), SpannableString.SPAN_INCLUSIVE_INCLUSIVE);
+
                     }
 
                 }
@@ -104,15 +109,18 @@ public class KeywordHighlighting {
                 }
 
                 if(word.charAt(0) == '#'){
-                    span.setSpan(new ForegroundColorSpan(Color.MAGENTA),begin,begin+word.length(),SpannableString.SPAN_INCLUSIVE_INCLUSIVE);
+                    span.setSpan(new ForegroundColorSpan(Color.parseColor("grey")),begin,begin+word.length(),SpannableString.SPAN_INCLUSIVE_INCLUSIVE);
+                }
+                if(word.charAt(0) == '/' && word.charAt(1) == '/'){
+                    span.setSpan(new ForegroundColorSpan(Color.GREEN),begin,begin+word.length(),SpannableString.SPAN_INCLUSIVE_INCLUSIVE);
                 }
 
                 begin = text.indexOf(word, begin + word.length());
                 if (begin == -1) break;
             }
         }
-        miniEditor.editText.setText(span);
-        miniEditor.editText.setSelection(text.length());
+        editText.setText(span);
+        editText.setSelection(select);
     }
 
     private boolean isNum(String s){

@@ -20,7 +20,7 @@ public class Indent {
     }
 
     //change the current text to correct indentation
-    protected static void indentation(MyEditText editText) {
+    protected static void setIndent(MyEditText editText) {
         String newContent = editText.getText().toString().substring(0, editText.getSelectionStart());
         for (int i = 0; i < indent; i++) {
             newContent = newContent + "    ";
@@ -47,8 +47,7 @@ public class Indent {
             }
             if (in == '\n') {
                 getIndent(editText);
-                indentation(editText);
-
+                setIndent(editText);
             }
         }
         textChangeFlag = 0;
