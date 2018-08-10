@@ -56,10 +56,18 @@ public class MyListActivity extends ListActivity {
                 delete = true;
                 ArrayAdapter arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_single_choice, data);
                 setListAdapter(arrayAdapter);
-                //data.clear();
                 if (data instanceof Serializable) {
                     PresistenceSave.putBean(this, "123", data);
                 }
+                break;
+            }
+            case R.id.action_clear:{
+                data.clear();
+                if (data instanceof Serializable) {
+                    PresistenceSave.putBean(this, "123", data);
+                }
+                ArrayAdapter arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, data);
+                setListAdapter(arrayAdapter);
                 break;
             }
         }

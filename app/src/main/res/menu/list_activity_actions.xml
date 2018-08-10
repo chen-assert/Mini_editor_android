@@ -9,5 +9,9 @@
             android:title="delete"
             android:icon="@drawable/ic_action_save"
             app:showAsAction="always"/>
-
+    <item
+            android:id="@+id/action_clear"
+            android:title="clear"
+            android:icon="@drawable/ic_action_save"
+            app:showAsAction="always"/>
 </menu>

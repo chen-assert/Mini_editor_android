@@ -21,6 +21,9 @@ public class KeywordHighlighting {
 
     //store all the C keywords in the map
     public KeywordHighlighting(){
+        keyWord.put("cin","purple");
+        keyWord.put("cout","purple");
+        keyWord.put("endl","purple");
         keyWord.put("printf","purple");
         keyWord.put("scanf","purple");
         keyWord.put("auto","blue");

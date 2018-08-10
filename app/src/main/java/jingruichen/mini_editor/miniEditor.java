@@ -120,10 +120,11 @@ public class miniEditor extends AppCompatActivity {
             file = new File(path.getAbsolutePath(), filename);
             System.out.println(path.getAbsolutePath());
             if (!file.exists()) {
-                file.createNewFile();
-            } else {
+                } else {
                 Toast.makeText(miniEditor.this, "file already exist...", Toast.LENGTH_SHORT).show();
+                file.delete();
             }
+            file.createNewFile();
             FileOutputStream fos = new FileOutputStream(file, true);
             fos.write(strcontent.getBytes());
             fos.close();
@@ -214,7 +215,9 @@ public class miniEditor extends AppCompatActivity {
                 Intent intent2 = new Intent(this, MyListActivity.class);
                 startActivityForResult(intent2, LIST_REQUESTCODE);
                 break;
-
+            case R.id.action_about:
+                about(builder);
+                break;
         }
         return super.onOptionsItemSelected(item);
 
@@ -237,6 +240,7 @@ public class miniEditor extends AppCompatActivity {
 
     protected void showText(Uri uri) {
         String str = null;
+        Indent.textChangeFlag=1;
         try {
             InputStream is = this.getContentResolver().openInputStream(uri);
             InputStreamReader input = new InputStreamReader(is, "UTF-8");
@@ -253,6 +257,7 @@ public class miniEditor extends AppCompatActivity {
         } catch (IOException editText) {
             Log.e("1", Log.getStackTraceString(editText));
         }
+        Indent.textChangeFlag=0;
     }
 
     //general settings
@@ -276,6 +281,15 @@ public class miniEditor extends AppCompatActivity {
             }
         });
 
+        builder.setCancelable(true);
+        AlertDialog d = builder.create();
+        d.show();
+    }
+    protected void about(AlertDialog.Builder builder) {
+        builder.setTitle("about");
+        builder.setIcon(R.drawable.ic_action_about);
+        String str=new String("miniEditor  ver0.98\nDeveloper:YangZhixuan,ChenJingrui,WangXueyi,ZhouZhiying\n----2018");
+        builder.setMessage(str);
         builder.setCancelable(true);
         AlertDialog d = builder.create();
         d.show();

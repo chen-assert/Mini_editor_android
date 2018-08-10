@@ -5,7 +5,7 @@ import android.text.Editable;
 import static jingruichen.mini_editor.miniEditor.editText;
 
 public class Indent {
-    private static int textChangeFlag = 0;
+    protected static int textChangeFlag = 0;
     private static int indent = 0;       //number of space in the front of  each line
     protected static void getIndent(MyEditText editText) {
         indent = 0;
