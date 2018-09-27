@@ -197,9 +197,10 @@ public class miniEditor extends AppCompatActivity {
             case R.id.action_email:
                 //send the files by email
                 intent = new Intent(Intent.ACTION_SEND);
-                intent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{"voltage111@sina.com"});
+                intent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{"example@email.com"});
                 intent.putExtra(android.content.Intent.EXTRA_SUBJECT, "SUBJECT");
-                intent.putExtra(android.content.Intent.EXTRA_TEXT, "Sending file from miniEditor...");
+                MyEditText edit=findViewById(R.id.editText);
+                intent.putExtra(android.content.Intent.EXTRA_TEXT, edit.getText());
                 intent.setType("text/html");
                 startActivity(Intent.createChooser(intent, "Please choose your email client"));
                 break;
